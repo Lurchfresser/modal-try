@@ -1,0 +1,139 @@
+{
+  "templates":[
+      {
+        "name": "first template",
+        "depthlevel": 2,
+        "tabs": {
+          "1": {
+            "depthlevel": 0,
+            "text": "This is a test for tab 1",
+            "header": "tab 1"
+          },
+          "2": {
+            "depthlevel": 2,
+            "text": "This is a test for tab 2",
+            "header": "tab 2",
+            "tabs": {
+              "1": {
+                "depthlevel": 0,
+                "text": "This is a test for tab 2.1",
+                "header": "tab 1"
+              },
+              "2": {
+                "depthlevel": 0,
+                "text": "This is a test for tab 2.2",
+                "header": "tab 2"
+              },
+              "3": {
+                "depthlevel": 0,
+                "text": "This is a test for tab 2.3",
+                "header": "tab 3"
+              },
+              "4": {
+                "depthlevel": 0,
+                "text": "This is a test for tab 2.4",
+                "header": "tab 4"
+              },
+              "5": {
+                "depthlevel": 0,
+                "text": "This is a test for tab 2.5",
+                "header": "tab 5"
+              },
+              "6": {
+                "depthlevel": 0,
+                "text": "This is a test for tab 2.6",
+                "header": "tab 6"
+              },
+              "7": {
+                "depthlevel": 0,
+                "text": "This is a test for tab 2.7",
+                "header": "tab 7"
+              },
+              "8": {
+                "depthlevel": 0,
+                "text": "This is a test for tab 2.8",
+                "header": "tab 8"
+              }
+            }
+          },
+          "3": {
+            "depthlevel": 0,
+            "text": "This is a test for tab 3",
+            "header": "tab 3"
+          },
+          "4": {
+            "depthlevel": 0,
+            "text": "This is a test for tab 4",
+            "header": "tab 4"
+          },
+          "5": {
+            "depthlevel": 0,
+            "text": "This is a test for tab 5",
+            "header": "tab 5"
+          },
+          "6": {
+            "depthlevel": 0,
+            "text": "This is a test for tab 6",
+            "header": "tab 6"
+          },
+          "7": {
+            "depthlevel": 0,
+            "text": "This is a test for tab 7",
+            "header": "tab 7"
+          },
+          "8": {
+            "depthlevel": 0,
+            "text": "This is a test for tab 8",
+            "header": "tab 8"
+          }
+        }
+      },
+      {
+        "name": "second template",
+        "depthlevel": 2,
+        "tabs": {
+          "1": {
+            "depthlevel": 0,
+            "text": "This is a test for tab 1",
+            "header": "tab 1"
+          },
+          "2": {
+            "depthlevel": 0,
+            "text": "This is a test for tab 2",
+            "header": "tab 2"
+          },
+          "3": {
+            "depthlevel": 0,
+            "text": "This is a test for tab 3",
+            "header": "tab 3"
+          },
+          "4": {
+            "depthlevel": 0,
+            "text": "This is a test for tab 4",
+            "header": "tab 4"
+          },
+          "5": {
+            "depthlevel": 0,
+            "text": "This is a test for tab 5",
+            "header": "tab 5"
+          },
+          "6": {
+            "depthlevel": 0,
+            "text": "This is a test for tab 6",
+            "header": "tab 6"
+          },
+          "7": {
+            "depthlevel": 0,
+            "text": "This is a test for tab 7",
+            "header": "tab 7"
+          },
+          "8": {
+            "depthlevel": 0,
+            "text": "This is a test for tab 8",
+            "header": "tab 8"
+          }
+        }
+      }
+  ],
+  "def": "first template"
+}
