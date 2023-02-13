@@ -75,60 +75,83 @@ document.addEventListener("keydown", async (key) => {
         await confirmChoice();
     }
 });
-document.onclick = async (e) => {
-    if (preActivated) {
-        if (isUserReviewCard(e.target)) {
-            preActivated = false;
-            await showModal();
-        }
-    }
-}
-let mouseOverBorderColor = "black";
-let prevMouseOver;
 
-let reviewCardContainerArr = [];
+
+let reviewCardContainerSet = new Set;
+let disAbleMaingridIf = true;
 //check if the review containing div has been loaded
 let loadObserver = new MutationObserver(function(mutations) {
+    /*for (let mutation of mutations){
+        for (let addedNote of mutation.addedNodes){
+            if (addedNote.className === "maingrid__content content" && disAbleMaingridIf){
+                document.getElementsByClassName("maingrid__content content")[0].addEventListener("scroll",(e)=>{
+                    scrollEventListener(e);
+                });
+                disAbleMaingridIf = false;
+            }
+        }
+    }*/
+    if (document.getElementsByClassName("maingrid__content content").length !== 0){
+        //console.log(document.getElementsByClassName("maingrid__content content")[0]);
+    }
+        //mit added Note vielleicht performanter
     if (document.getElementsByClassName("content__body__main reviews-content-body").length !== 0){
         reviewContentBody = document.getElementsByClassName("content__body__main reviews-content-body")[0];
-        reviewObserver.observe(document.getElementsByClassName("content__body__main reviews-content-body")[0],
-            {childList:true});
+        reviewObserver.observe(reviewContentBody,
+            {childList:true,subtree:true});
         loadObserver.disconnect();
     }
 });
-loadObserver.observe(document,{childList:true, subtree:true});
+loadObserver.observe(document.documentElement,{childList:true,subtree:true});
 let reviewContentBody;
 let reviewObserver = new MutationObserver(function(mutations) {
-    for (let child of reviewContentBody.children){
-        if (child.attributes['ng-repeat'] !== undefined){
-
-            for (let test of child.getElementsByClassName("reviewcard__container")){
-                console.log(test);
-            }
-
-            //reviewObserver.push das xte childElement
-        }
-    }
-});
-let ngRepeatObserver = new MutationObserver((mutations)=>{
     for (let mutation of mutations){
-        co
+        if (mutation.addedNodes.length >= 0 || mutation.removedNodes.length >= 0){
+            for (let addedNote of mutation.addedNodes){
+                if (addedNote.className === "reviewcard__starrating"){
+                    reviewCardContainerSet.add(addedNote.parentElement.parentElement.parentElement);
+                    addedNote.parentElement.parentElement.parentElement.onmouseenter = (e)=>{selectReviewcard(e)};
+                    addedNote.parentElement.parentElement.parentElement.onmouseleave = (e)=>{deSelectReviewcard(e)};
+                }
+            }
+        }
+        if (mutation.removedNodes.length >= 0){
+            for (let removedNode of mutation.removedNodes){
+                if (removedNode.tagName === "DIV"){
+                    removedNode.firstElementChild.firstElementChild.firstElementChild.removeEventListener("onmouseenter",selectReviewcard);
+                    removedNode.firstElementChild.firstElementChild.firstElementChild.removeEventListener("onmouseleave",deSelectReviewcard);
+                    reviewCardContainerSet.delete(removedNode.firstElementChild.firstElementChild.firstElementChild);
+                }
+            }
+        }
     }
 });
 
+let selectedReviewcard;
 
-//listener nur aktivieren wenn man Ihn braucht
-document.onmouseover = (e)=>{
-    let currentMouseOver = isUserReviewCard(e.target);
-    //console.log(currentMouseOver);
-    if (!(prevMouseOver === currentMouseOver)){
-        if (currentMouseOver !== false){
-            currentMouseOver.parentElement.style.border = "1px solid black";
-        }
-        else if (prevMouseOver?.parentElement?.style.borderWidth){
-            prevMouseOver.parentElement.style.borderWidth = "0px";
-        }
-        prevMouseOver = currentMouseOver;
+function selectReviewcard(e){
+    if (preActivated) {
+        selectedReviewcard = e.target;
+        e.target.style.border = "1px solid black";
+        //ist glaube ich nicht ganz der korrekte borderRadius
+        e.target.style.borderRadius = "5px";
+
+        e.target.onclick(startModal(e));
+    }
+}
+function deSelectReviewcard(e){
+    if (selectedReviewcard === e.target){
+        selectedReviewcard = undefined;
+    }
+    e.target.style.borderWidth = "0px";
+
+    e.target.removeEventListener("click",startModal(e));
+}
+
+
+function startModal(e){
+    if (e.target.getElementsByClassName("reviewcard__reviewfooter__reply")){
+        console.log(e.target);
     }
 }
 
