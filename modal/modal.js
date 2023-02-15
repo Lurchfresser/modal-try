@@ -117,10 +117,11 @@ let reviewObserver = new MutationObserver(function(mutations) {
         }
         if (mutation.removedNodes.length >= 0){
             for (let removedNode of mutation.removedNodes){
+                //können bei Antworten auch andere Divs remooved werden
                 if (removedNode.tagName === "DIV"){
-                    removedNode.firstElementChild.firstElementChild.firstElementChild.removeEventListener("onmouseenter",selectReviewcard);
-                    removedNode.firstElementChild.firstElementChild.firstElementChild.removeEventListener("onmouseleave",deSelectReviewcard);
-                    reviewCardContainerSet.delete(removedNode.firstElementChild.firstElementChild.firstElementChild);
+                    removedNode?.firstElementChild?.firstElementChild?.firstElementChild.removeEventListener("onmouseenter",selectReviewcard);
+                    removedNode?.firstElementChild?.firstElementChild?.firstElementChild.removeEventListener("onmouseleave",deSelectReviewcard);
+                    reviewCardContainerSet.delete(removedNode?.firstElementChild?.firstElementChild?.firstElementChild);
                 }
             }
         }
@@ -136,7 +137,7 @@ function selectReviewcard(e){
         //ist glaube ich nicht ganz der korrekte borderRadius
         e.target.style.borderRadius = "5px";
 
-        e.target.onclick(startModal(e));
+        e.target.addEventListener("click",startModal);
     }
 }
 function deSelectReviewcard(e){
@@ -145,19 +146,37 @@ function deSelectReviewcard(e){
     }
     e.target.style.borderWidth = "0px";
 
-    e.target.removeEventListener("click",startModal(e));
+    e.target.removeEventListener("click",startModal);
 }
 
 
-function startModal(e){
-    if (e.target.getElementsByClassName("reviewcard__reviewfooter__reply")){
-        console.log(e.target);
+async function startModal(e){
+    for (let Element of this.getElementsByClassName("reviewcard__reviewfooter__reply")){
+        if (Element.classList.length === 1){
+            Element.click();
+            let temp;
+            while (!temp) {
+                await sleep(2);
+                console.log(this.querySelector("textarea"));
+                if (this.querySelector("textarea")){
+                    temp = true;
+                }
+            }
+
+            replyTextArea = this.querySelector("textarea");
+            replyTextArea.value = "Hallo " + replyTextArea.value;
+            await showModal();
+        }
     }
+}
+
+function sleep(ms){
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 window.onkeydown = function (e) {
     if (activated) {
-        return !(e.key == "Spacebar" || e.key == " ");
+        return !(e.key == "Spacebar" || e.key == " " || e.key == "Enter");
     }
 };
 
@@ -270,18 +289,22 @@ function showChoice() {
     }
 }
 
+let replyTextArea;
 async function confirmChoice() {
-    switch (template.tabs[divToTemplate(modalSelected)]?.["depthlevel"]) {
+    let tab = template.tabs[divToTemplate(modalSelected)];
+    switch (tab?.["depthlevel"]) {
         case 2: {
             console.log(template);
-            template = template.tabs[divToTemplate(modalSelected)];
+            template = tab;
             await showModal();
             showChoice();
             break;
         }
         case 1:
+            replyTextArea.value += tab["texts"][Math.floor(Math.random() * tab["texts"].length)];
             break;
         case 0:
+            replyTextArea.value += tab.text;
             break;
     }
 

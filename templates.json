@@ -35,9 +35,9 @@
                 "header": "tab 4"
               },
               "5": {
-                "depthlevel": 0,
-                "text": "This is a test for tab 2.5",
-                "header": "tab 5"
+                "depthlevel": 1,
+                "texts": ["vielen Dank für Ihr Feedback. ","vielen Dank für Ihre positive Rezension. ","vielen Dank für Ihre tolle Bewertung. "],
+                "header": "Danke"
               },
               "6": {
                 "depthlevel": 0,
