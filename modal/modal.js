@@ -117,11 +117,12 @@ let reviewObserver = new MutationObserver(function(mutations) {
         }
         if (mutation.removedNodes.length >= 0){
             for (let removedNode of mutation.removedNodes){
-                //können bei Antworten auch andere Divs remooved werden
-                if (removedNode.tagName === "DIV"){
-                    removedNode?.firstElementChild?.firstElementChild?.firstElementChild.removeEventListener("onmouseenter",selectReviewcard);
-                    removedNode?.firstElementChild?.firstElementChild?.firstElementChild.removeEventListener("onmouseleave",deSelectReviewcard);
-                    reviewCardContainerSet.delete(removedNode?.firstElementChild?.firstElementChild?.firstElementChild);
+                //können bei Antworten auch andere Divs removed werden
+                if (removedNode.tagName === "DIV" && removedNode?.firstElementChild?.firstElementChild?.firstElementChild.className === "reviewcard__container"){
+                    console.log("yay");
+                    removedNode.firstElementChild.firstElementChild.firstElementChild.removeEventListener("onmouseenter",selectReviewcard);
+                    removedNode.firstElementChild.firstElementChild.firstElementChild.removeEventListener("onmouseleave",deSelectReviewcard);
+                    reviewCardContainerSet.delete(removedNode.firstElementChild.firstElementChild.firstElementChild);
                 }
             }
         }
