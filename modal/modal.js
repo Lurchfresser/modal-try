@@ -1,37 +1,16 @@
 let activated = false;
 let preActivated = false;
-let modal = document.createElement("div");
-let modalContent = document.createElement("div");
-let subModalContents = [];
-//modal.appendChild(modalContent);
 
+let modalClass;
+let modal;
 
-let primeSubModalColor = "crimson";
-let secondSubModalColor = "#e8e513";
-let depthColor0 = "black";
-let depthColor1 = "blue";
-let depthColor2 = "green";
-
-for (let i = 0; i < 9; i++) {
-    let tempSubModal = document.createElement("div");
-    modal.appendChild(tempSubModal);
-    subModalContents.push(tempSubModal);
-    tempSubModal.style.backgroundColor = primeSubModalColor;
-    tempSubModal.style.height = "100px";
-    tempSubModal.style.width = "100px";
-    tempSubModal.style.border = "3px solid";
-
+window.onload = async () => {
+    const src = chrome.runtime.getURL('modules/modalStyle.js');
+    let modalImport = await import(src);
+    modalClass = new modalImport.default;
+    modal = modalClass.modal;
+    await Start();
 }
-
-modal.style.backgroundColor = "aqua";
-modal.style.height = "300px";
-modal.style.width = "300px";
-modal.style.display = "none";
-modal.style.flexWrap = "wrap";
-modal.style.justifyContent = "space-between";
-modal.style.position = "fixed";
-
-window.onload = async () => await Start();
 
 async function applyDefaultTemplate() {
     await chrome.storage.local.get(["def"]).then((result) => {
@@ -51,7 +30,7 @@ async function Start() {
 }
 
 function append() {
-    document.querySelector("body").appendChild(modal);
+    document.querySelector("body").appendChild(modalClass.modal);
 }
 
 let mouseX = 0;
@@ -203,26 +182,14 @@ window.onkeydown = function (e) {
     }
 };
 
-function isUserReviewCard(target) {
-    let temp = true;
-    while (temp) {
-        if (target.tagName === "AR-USERREVIEW-CARD") {
-            return target;
-        } else if (target.tagName === "BODY") {
-            return false;
-        } else {
-            target = target.parentElement;
-        }
-    }
-}
 
-function lockChangeAlert() {
+async function lockChangeAlert() {
     if (!(document.pointerLockElement === modal) && activated) {
-        hideModal();
+        await hideModal();
     }
 }
 
-//document.addEventListener("pointerlockchange", lockChangeAlert, false);
+document.addEventListener("pointerlockchange", lockChangeAlert, false);
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API#simple_example_walkthrough
 // anschauen und in finaler Version besser machen
@@ -230,21 +197,15 @@ async function showModal() {
     modalSelected = 4;
     lastSelectedX = [];
     lastSelectedY = [];
-    for (let i = 0; i < subModalContents.length; i++) {
-        subModalContents[i].style.backgroundColor = primeSubModalColor;
-    }
-    subModalContents[modalSelected].style.backgroundColor = secondSubModalColor;
-    modal.style.display = "flex";
-    modal.style.left = (mouseX - 150).toString() + "px";
-    modal.style.top = (mouseY - 150).toString() + "px";
+    modalClass.show(mouseX-150,mouseY-150,modalSelected);
     activated = true;
     //firefox akzeptiert nicht, später ändern
     await modal.requestPointerLock();
-    showChoice();
+    modalClass.showChoice(template);
 }
 
 async function hideModal() {
-    modal.style.display = "none";
+    modalClass.hide();
     activated = false;
     await document.exitPointerLock();
 }
@@ -289,28 +250,9 @@ function select(e) {
         }
 
     }
-    for (let i = 0; i < subModalContents.length; i++) {
-        subModalContents[i].style.backgroundColor = primeSubModalColor;
-    }
-    subModalContents[modalSelected].style.backgroundColor = secondSubModalColor;
+    modalClass.select(modalSelected);
 }
 
-function showChoice() {
-    for (let tab of Object.keys(template.tabs)) {
-        subModalContents[TemplateToDiv(tab)].textContent = template.tabs[tab].header;
-        switch (template.tabs[tab]["depthlevel"]) {
-            case 2:
-                subModalContents[TemplateToDiv(tab)].style.borderColor = depthColor2;
-                break;
-            case 1:
-                subModalContents[TemplateToDiv(tab)].style.borderColor = depthColor1;
-                break;
-            case 0:
-                subModalContents[TemplateToDiv(tab)].style.borderColor = depthColor0;
-                break;
-        }
-    }
-}
 
 let replyTextArea;
 async function confirmChoice() {
@@ -320,7 +262,7 @@ async function confirmChoice() {
             console.log(template);
             template = tab;
             await showModal();
-            showChoice();
+            modalClass.showChoice(template);
             break;
         }
         case 1:
@@ -351,38 +293,6 @@ function average(arr) {
     return arr.reduce((a, b) => a + b, 0) / arr.length;
 }
 
-function TemplateToDiv(tem) {
-    switch (tem) {
-        //eigene funktion um Zahlen zu "übersetzen"
-        case 1:
-        case "1":
-            return 0;
-        case 2:
-        case "2":
-            return 1;
-        case 3:
-        case "3":
-            return 2;
-        case 4:
-        case "4":
-            return 5;
-        case 5:
-        case "5":
-            return 8;
-        case 6:
-        case "6":
-            return 7;
-        case 7:
-        case "7":
-            return 6;
-        case 8:
-        case "8":
-            return 3;
-        case 9:
-        case "9":
-            return 5;
-    }
-}
 
 function divToTemplate(Div) {
     switch (Div) {
