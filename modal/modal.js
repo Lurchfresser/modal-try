@@ -153,6 +153,7 @@ function deSelectReviewcard(e){
 
 async function startModal(e){
     for (let Element of this.getElementsByClassName("reviewcard__reviewfooter__reply")){
+        console.log(Element);
         if (Element.classList.length === 1){
             Element.click();
             let temp;
@@ -167,8 +168,29 @@ async function startModal(e){
             replyTextArea = this.querySelector("textarea");
             replyTextArea.value = "Hallo " + replyTextArea.value;
             await showModal();
+            break;
         }
     }
+    for (let Element2 of this.getElementsByClassName("button is-smaller is-outlined-primary")){
+        console.log(Element2);
+        if (Element2.classList.length === 3){
+            Element2.click();
+            let temp2;
+            while (!temp2) {
+                await sleep(2);
+                console.log(this.querySelector("textarea"));
+                if (this.querySelector("textarea")){
+                    temp2 = true;
+                }
+            }
+
+            replyTextArea = this.querySelector("textarea");
+            replyTextArea.value = "Hallo " + replyTextArea.value;
+            await showModal();
+            break;
+        }
+    }
+
 }
 
 function sleep(ms){
