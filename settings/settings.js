@@ -27,9 +27,17 @@ window.onload = async () => {
     modal.onmouseover = (e)=>{
         modalClass.select(Array.prototype.slice.call(modal.children).indexOf(e.target));
     }
+    modal.onclick = (e)=>{
+        console.log(template.tabs[(Array.prototype.slice.call(modal.children).indexOf(e.target) + 1)]);
+        if (e.target.parentElement === modal &&
+        template.tabs[(Array.prototype.slice.call(modal.children).indexOf(e.target) + 1)]["depthlevel"] === 2){
+            template = template.tabs[(Array.prototype.slice.call(modal.children).indexOf(e.target) + 1)];
+            modalClass.showChoice(template);
+        }
+    }
 }
 
-sel.addEventListener("change",loadTemplate)
+sel.addEventListener("change",loadTemplate);
 
 function loadTemplate(){
     template = templates[sel.selectedIndex];

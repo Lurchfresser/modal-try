@@ -239,7 +239,7 @@ function select(e) {
 
 let replyTextArea;
 async function confirmChoice() {
-    let tab = template.tabs[divToTemplate(modalSelected)];
+    let tab = template.tabs[modalClass.divToTemplate(modalSelected)];
     switch (tab?.["depthlevel"]) {
         case 2: {
             console.log(template);
@@ -276,30 +276,6 @@ function average(arr) {
     return arr.reduce((a, b) => a + b, 0) / arr.length;
 }
 
-
-function divToTemplate(Div) {
-    switch (Div) {
-        case 0:
-            return "1";
-        case 1:
-            return "2";
-        case 2:
-            return "3";
-        case 3:
-            return "8";
-        case 4:
-            return "9";
-        case 5:
-            return "4";
-        case 6:
-            return "7";
-        case 7:
-            return "6";
-        case 8:
-            return "5";
-
-    }
-}
 
 document.addEventListener("mousemove", (e) => {
     if (document.pointerLockElement === modal) {

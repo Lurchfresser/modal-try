@@ -4,7 +4,7 @@ document.getElementById("changebtn").addEventListener("click", async () => {
         text: sel.options[sel.selectedIndex].text,
         tabId: currentTab.id
     });
-    if (!currentTab.url.startsWith("chrome://")) {
+    if (!currentTab.url.startsWith("chrome")) {
         await chrome.tabs.sendMessage(
             currentTab.id, {
                 "template": sel.options[sel.selectedIndex].text,
