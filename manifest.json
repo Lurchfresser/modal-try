@@ -32,7 +32,9 @@
       "128": "images/icon128.png"
     },
     "default_title": "change set",
-    "default_popup": "popup/popup.html"
+    "default_popup": "popup/popup.html",
+    "browser_style": true,
+    "chrome_style": true
   },
   "permissions": ["activeTab","scripting","tabs","storage"]
 }

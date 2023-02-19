@@ -57,21 +57,9 @@ document.addEventListener("keydown", async (key) => {
 
 
 let reviewCardContainerSet = new Set;
-let disAbleMaingridIf = true;
 //check if the review containing div has been loaded
 let loadObserver = new MutationObserver(function(mutations) {
-    /*for (let mutation of mutations){
-        for (let addedNote of mutation.addedNodes){
-            if (addedNote.className === "maingrid__content content" && disAbleMaingridIf){
-                document.getElementsByClassName("maingrid__content content")[0].addEventListener("scroll",(e)=>{
-                    scrollEventListener(e);
-                });
-                disAbleMaingridIf = false;
-            }
-        }
-    }*/
     if (document.getElementsByClassName("maingrid__content content").length !== 0){
-        //console.log(document.getElementsByClassName("maingrid__content content")[0]);
     }
         //mit added Note vielleicht performanter
     if (document.getElementsByClassName("content__body__main reviews-content-body").length !== 0){
@@ -129,16 +117,14 @@ function deSelectReviewcard(e){
     e.target.removeEventListener("click",startModal);
 }
 
-
+//cancelbutton implementieren und Antwort abschicken
 async function startModal(e){
     for (let Element of this.getElementsByClassName("reviewcard__reviewfooter__reply")){
-        console.log(Element);
         if (Element.classList.length === 1){
             Element.click();
             let temp;
             while (!temp) {
-                await sleep(2);
-                console.log(this.querySelector("textarea"));
+                await sleep(1);
                 if (this.querySelector("textarea")){
                     temp = true;
                 }
@@ -151,13 +137,11 @@ async function startModal(e){
         }
     }
     for (let Element2 of this.getElementsByClassName("button is-smaller is-outlined-primary")){
-        console.log(Element2);
         if (Element2.classList.length === 3){
             Element2.click();
             let temp2;
             while (!temp2) {
-                await sleep(2);
-                console.log(this.querySelector("textarea"));
+                await sleep(1);
                 if (this.querySelector("textarea")){
                     temp2 = true;
                 }
@@ -169,7 +153,6 @@ async function startModal(e){
             break;
         }
     }
-
 }
 
 function sleep(ms){
@@ -185,7 +168,7 @@ window.onkeydown = function (e) {
 
 async function lockChangeAlert() {
     if (!(document.pointerLockElement === modal) && activated) {
-        await hideModal();
+        //await hideModal();
     }
 }
 
@@ -337,4 +320,3 @@ chrome.runtime.onMessage.addListener(async function (request, sender, sendRespon
         sendResponse({"NavIsShown": NavIsShown});
     }
 });
-

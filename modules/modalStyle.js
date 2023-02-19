@@ -23,6 +23,7 @@ export default class modal {
             this.tempSubModal.style.height = "100px";
             this.tempSubModal.style.width = "100px";
             this.tempSubModal.style.border = "3px solid";
+            this.tempSubModal.style.boxSizing = "border-box";
         }
 
         this.modal.style.backgroundColor = "aqua";
@@ -32,6 +33,8 @@ export default class modal {
         this.modal.style.flexWrap = "wrap";
         this.modal.style.justifyContent = "space-between";
         this.modal.style.position = "fixed";
+        this.modal.style.boxSizing = "inherit";
+
     }
 
     hide() {

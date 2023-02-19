@@ -44,17 +44,19 @@ window.onload = async () => {
     await chrome.storage.local.get(["templates"]).then((result) => {
         templates = result["templates"];
     });
-    for (i = 0; i < templates.length; i++) {
+    for (let i = 0; i < templates.length; i++) {
         let option = document.createElement("option");
         option.textContent = templates[i].name;
         sel.appendChild(option);
     }
-    await chrome.tabs.sendMessage(
-        currentTab.id, {
-            "reason": "isNavShown",
-        }).then(response =>{
-        document.getElementById("hideNav").checked = !response["NavIsShown"];
-    });
+    if (!currentTab.url.startsWith("chrome")) {
+        await chrome.tabs.sendMessage(
+            currentTab.id, {
+                "reason": "isNavShown",
+            }).then(response => {
+            document.getElementById("hideNav").checked = !response["NavIsShown"];
+        });
+    }
 }
 
 async function getCurrentTab() {
