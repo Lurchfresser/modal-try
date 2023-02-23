@@ -54,29 +54,41 @@ export default class modal {
 
     showChoice(template) {
         for (let tab of Object.keys(template.tabs)) {
-            this.subModalContents[this.TemplateToDiv(tab)].textContent = template.tabs[tab].header;
+            this.subModalContents[this.templateToDiv(tab)].textContent = template.tabs[tab].header;
             switch (template.tabs[tab]["depthlevel"]) {
                 case 2:
-                    this.subModalContents[this.TemplateToDiv(tab)].style.borderColor = this.depthColor2;
+                    this.subModalContents[this.templateToDiv(tab)].style.borderColor = this.depthColor2;
                     break;
                 case 1:
-                    this.subModalContents[this.TemplateToDiv(tab)].style.borderColor = this.depthColor1;
+                    this.subModalContents[this.templateToDiv(tab)].style.borderColor = this.depthColor1;
                     break;
                 case 0:
-                    this.subModalContents[this.TemplateToDiv(tab)].style.borderColor = this.depthColor0;
+                    this.subModalContents[this.templateToDiv(tab)].style.borderColor = this.depthColor0;
                     break;
             }
         }
     }
 
-    select(modalSelected){
+    select(modalSelected) {
         for (let i = 0; i < this.subModalContents.length; i++) {
             this.subModalContents[i].style.backgroundColor = this.primeSubModalColor;
         }
         this.subModalContents[modalSelected].style.backgroundColor = this.secondSubModalColor;
     }
 
-    TemplateToDiv(tem) {
+
+    output(tab) {
+        if (tab["depthlevel"] === 0) {
+            return tab.text;
+        } else if (tab["depthlevel"] === 1) {
+            return tab["texts"][Math.floor(Math.random() * tab["texts"].length)];
+        } else if (tab["depthlevel"] === 2) {
+            return tab.tabs;
+        }
+    }
+
+
+    templateToDiv(tem) {
         switch (tem) {
             //eigene funktion um Zahlen zu "übersetzen"
             case 1:
@@ -105,7 +117,7 @@ export default class modal {
                 return 3;
             case 9:
             case "9":
-                return 5;
+                return 4;
         }
     }
 

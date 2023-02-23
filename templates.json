@@ -11,7 +11,6 @@
           },
           "2": {
             "depthlevel": 2,
-            "text": "This is a test for tab 2",
             "header": "tab 2",
             "tabs": {
               "1": {

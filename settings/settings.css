@@ -2,3 +2,31 @@
     width: 18px;
     height: 18px;
 }
+
+#textarea_test{
+    height: 120px;
+    width: 500px;
+}
+
+#edit_tab{
+    display: flow-root;
+}
+
+#textarea_edit{
+    width: 300px;
+    height: 70px;
+}
+
+#contextMenu{
+    display: none;
+    position: absolute;
+    background-color: whitesmoke;
+    border: 1px solid black;
+}
+
+#contextMenuDelete,#contextMenuEdit{
+    border: 1px solid gray;
+}
+#contextMenuDelete:hover,#contextMenuEdit:hover{
+    background-color: gray;
+}

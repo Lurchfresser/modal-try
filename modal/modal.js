@@ -240,22 +240,14 @@ function select(e) {
 let replyTextArea;
 async function confirmChoice() {
     let tab = template.tabs[modalClass.divToTemplate(modalSelected)];
-    switch (tab?.["depthlevel"]) {
-        case 2: {
-            console.log(template);
-            template = tab;
-            await showModal();
-            modalClass.showChoice(template);
-            break;
-        }
-        case 1:
-            replyTextArea.value += tab["texts"][Math.floor(Math.random() * tab["texts"].length)];
-            break;
-        case 0:
-            replyTextArea.value += tab.text;
-            break;
+    if (tab["depthlevel"] !== 2){
+        replyTextArea.value += modalClass.output(tab);
     }
-
+    else if (tab["depthlevel"] !== 2){
+        template = tab;
+        await showModal();
+        modalClass.showChoice(template);
+    }
 }
 
 let template;
@@ -271,11 +263,9 @@ Math.degrees = function (radians) {
     }
     return temp;
 }
-
 function average(arr) {
     return arr.reduce((a, b) => a + b, 0) / arr.length;
 }
-
 
 document.addEventListener("mousemove", (e) => {
     if (document.pointerLockElement === modal) {
@@ -283,13 +273,12 @@ document.addEventListener("mousemove", (e) => {
     }
 })
 
-
 chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
     if (request?.reason === "updated") {
         await Start();
     }
-    //wenn Modal aktiv ist response senden, so dass select wieder zurück gesetzt wird
     else if (request?.reason === "new template") {
+
     } else if (request?.reason === "hideNav") {
         NavIsShown = !request.checked;
     } else if (request?.reason === "isNavShown") {
