@@ -12,6 +12,7 @@ window.onload = async () => {
     await Start();
 }
 
+let defaultTemplate;
 async function applyDefaultTemplate() {
     await chrome.storage.local.get(["def"]).then((result) => {
         template = templates.find(e => e.name = result), () => {
@@ -19,6 +20,7 @@ async function applyDefaultTemplate() {
         };
     });
     template = template ?? templates[0];
+    defaultTemplate = template;
 }
 
 async function Start() {
@@ -103,31 +105,32 @@ function deSelectReviewcard(e) {
 
 //cancelbutton implementieren und Antwort abschicken
 async function startModal(e) {
-    console.log(e.target);
-    //for loop because the hidden buttons also have the same classname(but not same classlist -> if(classlist.lenght))
-    for (let Element of this.getElementsByClassName("reviewcard__reviewfooter__reply")) {
-        if (Element.classList.length === 1) {
-            //remove and add Eventlistener, because the clickfunction would trigger the function recursivly
-            this.removeEventListener("click", startModal);
-            Element.click();
-            this.addEventListener("click", startModal);
-            //textarea needs 1 milisec to be loaded
-            let temp;
-            while (!temp) {
-                await sleep(1);
-                if (this.querySelector("textarea")) {
-                    temp = true;
+    //if is for the cancelbutton and textarea to work without triggering the modal
+    if (e.target.className !== "button is-smaller u-mr-s" && !e.target.contains(document.getElementsByClassName("reviewcard__replywrap")[0])) {
+        //for loop because the hidden buttons also have the same classname(but not same classlist -> if(classlist.lenght))
+        //this is for unanswered reviews
+        for (let Element of this.getElementsByClassName("reviewcard__reviewfooter__reply")) {
+            if (Element.classList.length === 1) {
+                //remove and add Eventlistener, because the clickfunction would trigger the function recursivly
+                this.removeEventListener("click", startModal);
+                Element.click();
+                this.addEventListener("click", startModal);
+                //textarea needs 1 milisec to be loaded
+                let temp;
+                while (!temp) {
+                    await sleep(1);
+                    if (this.querySelector("textarea")) {
+                        temp = true;
+                    }
                 }
-            }
 
-            replyTextArea = this.querySelector("textarea");
-            replyTextArea.value = "Hallo " + replyTextArea.value;
-            await showModal();
-            break;
+                replyTextArea = this.querySelector("textarea");
+                replyTextArea.value = "Hallo " + replyTextArea.value;
+                await showModal();
+                break;
+            }
         }
-    }
-    //if is for the cancelbutton to work
-    if (e.target.className !== "button is-smaller u-mr-s") {
+        //this is for edit reply
         for (let Element2 of this.getElementsByClassName("button is-smaller is-outlined-primary")) {
             if (Element2.classList.length === 3) {
                 this.removeEventListener("click", startModal);
@@ -142,14 +145,17 @@ async function startModal(e) {
 
                 }
                 replyTextArea = this.querySelector("textarea");
-                replyTextArea.value = "Hallo " + replyTextArea.value;
                 await showModal();
                 break;
             }
         }
+        //for already opened Reviews
+        if (this.getElementsByClassName("reviewcard__replyheader")[0]) {
+            replyTextArea = this.querySelector("textarea");
+            await showModal();
+        }
     }
 }
-
 
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API#simple_example_walkthrough
@@ -169,6 +175,7 @@ async function hideModal() {
     modalClass.hide();
     activated = false;
     await document.exitPointerLock();
+    template = defaultTemplate;
 }
 
 let modalSelected = 4;
@@ -221,7 +228,7 @@ async function confirmChoice() {
     let tab = template.tabs[modalClass.divToTemplate(modalSelected)];
     if (tab["depthlevel"] !== 2) {
         replyTextArea.value += modalClass.output(tab);
-    } else if (tab["depthlevel"] !== 2) {
+    } else if (tab["depthlevel"] === 2) {
         template = tab;
         await showModal();
         modalClass.showChoice(template);
@@ -241,13 +248,14 @@ Math.degrees = function (radians) {
     }
     return temp;
 }
+
 function average(arr) {
     return arr.reduce((a, b) => a + b, 0) / arr.length;
 }
+
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-
 
 async function lockChangeAlert() {
     if (!(document.pointerLockElement === modal) && activated) {
