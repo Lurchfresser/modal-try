@@ -35,8 +35,16 @@ export default class modal {
         this.modal.style.justifyContent = "space-between";
         this.modal.style.position = "fixed";
         this.modal.style.boxSizing = "inherit";
+        this.modal.style.zIndex = "2147483647";
 
     }
+
+    getWidth(){
+        return $(this.modal).outerWidth();
+    };
+    getHeight(){
+        return $(this.modal).outerHeight();
+    };
 
     hide() {
         this.modal.style.display = "none";

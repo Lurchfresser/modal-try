@@ -13,6 +13,7 @@ window.onload = async () => {
 }
 
 let defaultTemplate;
+
 async function applyDefaultTemplate() {
     await chrome.storage.local.get(["def"]).then((result) => {
         template = templates.find(e => e.name = result), () => {
@@ -103,10 +104,10 @@ function deSelectReviewcard(e) {
     e.target.removeEventListener("click", startModal);
 }
 
-//cancelbutton implementieren und Antwort abschicken
+//Antwort abschicken, Reviewcard global varaible, delete textarea
 async function startModal(e) {
     //if is for the cancelbutton and textarea to work without triggering the modal
-    if (e.target.className !== "button is-smaller u-mr-s" && !e.target.contains(document.getElementsByClassName("reviewcard__replywrap")[0])) {
+    if (!($(e.target).text().trim() === "Cancel" && $(e.target).prop("tagName") === "BUTTON") && !e.target.contains(document.getElementsByClassName("reviewcard__replywrap")[0])) {
         //for loop because the hidden buttons also have the same classname(but not same classlist -> if(classlist.lenght))
         //this is for unanswered reviews
         for (let Element of this.getElementsByClassName("reviewcard__reviewfooter__reply")) {
@@ -123,11 +124,11 @@ async function startModal(e) {
                         temp = true;
                     }
                 }
-
                 replyTextArea = this.querySelector("textarea");
+
                 replyTextArea.value = "Hallo " + replyTextArea.value;
-                await showModal();
-                break;
+                await positionModal(this);
+                return undefined;
             }
         }
         //this is for edit reply
@@ -142,29 +143,118 @@ async function startModal(e) {
                     if (this.querySelector("textarea")) {
                         temp2 = true;
                     }
-
                 }
+
                 replyTextArea = this.querySelector("textarea");
-                await showModal();
-                break;
+                await positionModal(this);
+                return undefined;
             }
         }
         //for already opened Reviews
         if (this.getElementsByClassName("reviewcard__replyheader")[0]) {
             replyTextArea = this.querySelector("textarea");
-            await showModal();
+            await positionModal(this);
         }
+
     }
 }
 
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Pointer_Lock_API#simple_example_walkthrough
 // anschauen und in finaler Version besser machen
-async function showModal() {
+async function positionModal(reviewCard) {
+    let rect = reviewCard.getBoundingClientRect();
+    let viewportHeight = $(":root")[0].clientHeight;
+    let viewportWidth = $(":root")[0].clientWidth;
+    let X;
+    let Y;
+    let modalWidth = modalClass.getWidth()
+    let modalHeight = modalClass.getHeight()
+    function testModalPosition(){
+        //                    nach rechts, an der rechten, oberen Ecke positioniert
+        if (isRoomForModal(rect.left + rect.width + 5, rect.top)) {
+            X = rect.left + rect.width + 5;
+            Y = rect.top;
+        }
+        //nach links, an der oberen, linken Ecke
+        else if (isRoomForModal(rect.left - modalWidth - 5, rect.top)) {
+            X = rect.left - modalWidth - 5;
+            Y = rect.top;
+        }        //nach oben an der linken, oberen Ecke
+        else if (isRoomForModal(rect.left, rect.top - modalHeight - 5)) {
+            X = rect.left;
+            Y = rect.top - modalHeight - 5;
+        }        //nach unten an der linken, oberen Ecke
+        else if (isRoomForModal(rect.left, rect.bottom + 5)) {
+            X = rect.left;
+            Y = rect.bottom + 5;
+        }
+    }
+    if (!isReviewcardFullyVisible(rect)) {
+        reviewCard.scrollIntoView({block:"start",inline:"start"});
+    }
+    rect = reviewCard.getBoundingClientRect();
+    testModalPosition();
+    if (X && Y) {
+        await showModal(X, Y);
+    }
+    else {
+        let form = $(reviewCard).find("[name='replyForm']")[0];
+        form.scrollIntoView({block:"start",inline:"start"});
+        rect = form.getBoundingClientRect();
+        testModalPosition();
+        if (X && Y) {
+            await showModal(X, Y);
+        }
+        else {
+            let textarea = $(reviewCard).find("textarea")[0];
+            textarea.scrollIntoView({block:"start",inline:"start"});
+            rect = textarea.getBoundingClientRect();
+            testModalPosition();
+            if (X && Y) {
+                await showModal(X, Y);
+            }
+            else {
+                X = 0;
+                Y = viewportHeight - modalHeight;
+                await showModal(X,Y);
+            }
+        }
+    }
+}
+
+function isReviewcardFullyVisible(rect) {
+    if (rect.left - $(".maingrid__nav").outerWidth() > 0 &&
+        $(":root")[0].clientWidth - rect.right > 0 &&
+        rect.top - $(".maingrid__header").outerHeight() > 0 &&
+        $(":root")[0].clientHeight - rect.bottom > 0
+    ) {
+        return true;
+    }
+    return false;
+}
+
+function isRoomForModal(X, Y) {
+    let modalWidth = modalClass.getWidth()
+    let modalHeight = modalClass.getHeight()
+    //Modal ist nicht oberhalb oder links vom Viewport
+    if (X > 0 && Y > 0) {
+        //Modal ist nicht rechts vom Viewport
+        if (modalWidth + X < $(":root")[0].clientWidth) {
+            if (modalHeight + Y < $(":root")[0].clientHeight) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+
+async function showModal(X, Y) {
     modalSelected = 4;
     lastSelectedX = [];
     lastSelectedY = [];
-    modalClass.show(mouseX - 150, mouseY - 150, modalSelected);
+    modalClass.show(X, Y, modalSelected);
     activated = true;
     //firefox akzeptiert nicht, später ändern
     await modal.requestPointerLock();

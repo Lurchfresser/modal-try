@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Modal Try",
-  "description": "First try to create the shortcuts",
+  "name": "App Radar pro",
+  "description": "Write replys faster",
   "version": "0.0.1",
   "icons": {
     "16": "images/icon16.png",
@@ -14,7 +14,7 @@
   },
   "content_scripts": [
     {
-      "js": ["modal/modal.js"],
+      "js": ["modal/modal.js","libraries/jquery-3.6.3.js"],
       "matches": [
         "https://web.appradar.com/*reviews"
       ]
