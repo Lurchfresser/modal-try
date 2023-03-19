@@ -165,12 +165,12 @@ async function startModal(e) {
 async function positionModal(reviewCard) {
     let rect = reviewCard.getBoundingClientRect();
     let viewportHeight = $(":root")[0].clientHeight;
-    let viewportWidth = $(":root")[0].clientWidth;
     let X;
     let Y;
-    let modalWidth = modalClass.getWidth()
-    let modalHeight = modalClass.getHeight()
-    function testModalPosition(){
+    let modalWidth = modalClass.getWidth();
+    let modalHeight = modalClass.getHeight();
+
+    function testModalPosition() {
         //                    nach rechts, an der rechten, oberen Ecke positioniert
         if (isRoomForModal(rect.left + rect.width + 5, rect.top)) {
             X = rect.left + rect.width + 5;
@@ -190,34 +190,33 @@ async function positionModal(reviewCard) {
             Y = rect.bottom + 5;
         }
     }
+
     if (!isReviewcardFullyVisible(rect)) {
-        reviewCard.scrollIntoView({block:"start",inline:"start"});
+        reviewCard.scrollIntoView({block: "start", inline: "end"});
     }
     rect = reviewCard.getBoundingClientRect();
     testModalPosition();
     if (X && Y) {
         await showModal(X, Y);
-    }
-    else {
+    } else {
         let form = $(reviewCard).find("[name='replyForm']")[0];
-        form.scrollIntoView({block:"start",inline:"start"});
-        rect = form.getBoundingClientRect();
+        scrollContentIntoView(form,$(".maingrid__content.content")[0]);
+        rect = getInnerRect(form);
         testModalPosition();
         if (X && Y) {
+            console.log("form");
             await showModal(X, Y);
-        }
-        else {
+        } else {
             let textarea = $(reviewCard).find("textarea")[0];
-            textarea.scrollIntoView({block:"start",inline:"start"});
+            textarea.scrollIntoView({block: "start", inline: "end"});
             rect = textarea.getBoundingClientRect();
             testModalPosition();
             if (X && Y) {
                 await showModal(X, Y);
-            }
-            else {
+            } else {
                 X = 0;
                 Y = viewportHeight - modalHeight;
-                await showModal(X,Y);
+                await showModal(X, Y);
             }
         }
     }
@@ -345,6 +344,25 @@ function average(arr) {
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function getInnerRect(Element) {
+    let boundingRect = Element.getBoundingClientRect();
+    let newBoundingRect = new DOMRect(boundingRect.left + parseInt($(Element).css('padding-left')),
+        boundingRect.top + parseInt($(Element).css('padding-top')),
+        $(Element).width(),
+        $(Element).height());
+    console.log(boundingRect);
+    console.log(newBoundingRect);
+    return newBoundingRect;
+}
+
+function scrollContentIntoView(Element,scrollableParent){
+    console.log(scrollableParent);
+    Element.scrollIntoView({block: "start", inline: "end"});
+    let X = parseInt($(Element).css('padding-right'));
+    let Y = parseInt($(Element).css('padding-top'));
+    scrollableParent.scrollBy(-X,-Y);
 }
 
 async function lockChangeAlert() {
