@@ -61,7 +61,7 @@ export default class modal {
     }
 
     showChoice(template) {
-        for (let tab of Object.keys(template.tabs)) {
+        for (let tab in template.tabs) {
             this.subModalContents[this.templateToDiv(tab)].textContent = template.tabs[tab].header;
             switch (template.tabs[tab]["depthlevel"]) {
                 case 2:

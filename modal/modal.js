@@ -1,15 +1,21 @@
 let activated = false;
 let preActivated = false;
 
+let onReviewPage = window.location.href.endsWith("reviews");
+
+
+let modalImport;
 let modalClass;
 let modal;
 
-window.onload = async () => {
+window.onload = async function importModule() {
     const src = chrome.runtime.getURL('modules/modalStyle.js');
-    let modalImport = await import(src);
+    modalImport = await import(src);
     modalClass = new modalImport.default;
     modal = modalClass.modal;
-    await Start();
+    if (window.location.href.endsWith("reviews")) {
+        await Start();
+    }
 }
 
 let defaultTemplate;
@@ -25,6 +31,17 @@ async function applyDefaultTemplate() {
 }
 
 async function Start() {
+    //no jquery Event Listeners, because in vanilla they can't get attached twice
+    document.addEventListener("pointerlockchange", lockChangeAlert);
+
+    window.addEventListener("mousemove", pointerLockMouseMove);
+
+    window.addEventListener("keydown", modalKeyControls);
+
+    window.addEventListener("mouseup", pointerLockControls);
+
+    loadObserver.observe(document.documentElement, {childList: true, subtree: true});
+
     append();
     await chrome.storage.local.get(["templates"]).then((result) => {
         templates = result.templates;
@@ -32,12 +49,54 @@ async function Start() {
     await applyDefaultTemplate();
 }
 
+async function startFromHistoryStateChange() {
+    loadObserver.observe(document.documentElement, {childList: true, subtree: true});
+    activated = false;
+    preActivated = false;
+
+    modalClass = new modalImport.default;
+    modal = modalClass.modal;
+
+    modalSelected = 4;
+
+    lastSelectedX = [];
+    lastSelectedY = [];
+
+    document.addEventListener("pointerlockchange", lockChangeAlert);
+
+    window.addEventListener("mousemove", pointerLockMouseMove);
+
+    window.addEventListener("keydown", modalKeyControls);
+
+    window.addEventListener("mouseup", pointerLockControls);
+
+    await Start();
+}
+
+async function endFromHistoryStateChange() {
+    loadObserver.disconnect();
+    reviewObserver.disconnect();
+    reviewCardContainerSet.clear();
+    reviewContentBody = undefined;
+    selectedReviewcard = undefined;
+
+    replyTextArea = undefined;
+
+    template = undefined;
+    templates = undefined;
+
+    NavIsShown = true;
+
+    document.removeEventListener("pointerlockchange", lockChangeAlert);
+    window.removeEventListener("mousemove", pointerLockMouseMove);
+    window.removeEventListener("keydown", modalKeyControls);
+    window.removeEventListener("mouseup", pointerLockControls);
+}
+
 function append() {
     document.querySelector("body").appendChild(modalClass.modal);
 }
 
-let mouseX = 0;
-let mouseY = 0;
 
 let reviewCardContainerSet = new Set;
 //check if the review containing div has been loaded
@@ -52,7 +111,6 @@ let loadObserver = new MutationObserver(function (mutations) {
         loadObserver.disconnect();
     }
 });
-loadObserver.observe(document.documentElement, {childList: true, subtree: true});
 let reviewContentBody;
 let reviewObserver = new MutationObserver(function (mutations) {
     for (let mutation of mutations) {
@@ -73,7 +131,6 @@ let reviewObserver = new MutationObserver(function (mutations) {
             for (let removedNode of mutation.removedNodes) {
                 //können bei Antworten auch andere Divs removed werden
                 if (removedNode.tagName === "DIV" && removedNode?.firstElementChild?.firstElementChild?.firstElementChild.className === "reviewcard__container") {
-                    console.log("yay");
                     removedNode.firstElementChild.firstElementChild.firstElementChild.removeEventListener("onmouseenter", selectReviewcard);
                     removedNode.firstElementChild.firstElementChild.firstElementChild.removeEventListener("onmouseleave", deSelectReviewcard);
                     reviewCardContainerSet.delete(removedNode.firstElementChild.firstElementChild.firstElementChild);
@@ -151,8 +208,9 @@ async function startModal(e) {
             }
         }
         //for already opened Reviews
-        if (this.getElementsByClassName("reviewcard__replyheader")[0]) {
-            replyTextArea = this.querySelector("textarea");
+        replyTextArea = this.querySelector("textarea");
+        if (this.getElementsByClassName("reviewcard__replyheader")[0] && e.target !== replyTextArea) {
+            replyTextArea.selectionStart = replyTextArea.selectionEnd = replyTextArea.value.length;
             await positionModal(this);
         }
 
@@ -200,11 +258,10 @@ async function positionModal(reviewCard) {
         await showModal(X, Y);
     } else {
         let form = $(reviewCard).find("[name='replyForm']")[0];
-        scrollContentIntoView(form,$(".maingrid__content.content")[0]);
+        scrollContentIntoView(form, $(".maingrid__content.content")[0]);
         rect = getInnerRect(form);
         testModalPosition();
         if (X && Y) {
-            console.log("form");
             await showModal(X, Y);
         } else {
             let textarea = $(reviewCard).find("textarea")[0];
@@ -274,6 +331,7 @@ let lastSelectedY = [];
 
 function select(e) {
 
+
     while (lastSelectedX.length > 5) {
         lastSelectedX.pop();
     }
@@ -314,12 +372,13 @@ function select(e) {
 let replyTextArea;
 
 async function confirmChoice() {
+    let InputEvent = new Event("input", {bubbles: true, cancelable: true});
+    replyTextArea.dispatchEvent(InputEvent);
     let tab = template.tabs[modalClass.divToTemplate(modalSelected)];
     if (tab["depthlevel"] !== 2) {
         replyTextArea.value += modalClass.output(tab);
     } else if (tab["depthlevel"] === 2) {
         template = tab;
-        await showModal();
         modalClass.showChoice(template);
     }
 }
@@ -352,18 +411,16 @@ function getInnerRect(Element) {
         boundingRect.top + parseInt($(Element).css('padding-top')),
         $(Element).width(),
         $(Element).height());
-    console.log(boundingRect);
-    console.log(newBoundingRect);
     return newBoundingRect;
 }
 
-function scrollContentIntoView(Element,scrollableParent){
-    console.log(scrollableParent);
+function scrollContentIntoView(Element, scrollableParent) {
     Element.scrollIntoView({block: "start", inline: "end"});
     let X = parseInt($(Element).css('padding-right'));
     let Y = parseInt($(Element).css('padding-top'));
-    scrollableParent.scrollBy(-X,-Y);
+    scrollableParent.scrollBy(-X, -Y);
 }
+
 
 async function lockChangeAlert() {
     if (!(document.pointerLockElement === modal) && activated) {
@@ -371,18 +428,22 @@ async function lockChangeAlert() {
     }
 }
 
-document.addEventListener("pointerlockchange", lockChangeAlert, false);
-document.addEventListener("mousemove", (e) => {
+function pointerLockMouseMove(e) {
     if (document.pointerLockElement === modal) {
         select(e);
     }
-})
-document.querySelector("body").onmousemove = (event) => {
-    mouseX = event.clientX;
-    mouseY = event.clientY;
 }
-document.addEventListener("keydown", async (key) => {
-    if ((key.key == "m" || key.key == "M") && key.ctrlKey) {
+
+async function modalKeyControls(keyboardEvent) {
+    let key = keyboardEvent.key;
+    if (activated) {
+        if (key === "Enter") {
+            keyboardEvent.preventDefault();
+            submitReview();
+        } else if (key === "Escape") {
+            await hideModal();
+        }
+    } else if ((key === "m" || key === "M") && keyboardEvent.ctrlKey) {
         if (activated) {
             await hideModal()
         } else if (preActivated) {
@@ -390,27 +451,46 @@ document.addEventListener("keydown", async (key) => {
         } else if (!preActivated) {
             preActivated = true;
         }
-    } else if (key.key == "Escape" && activated) {
-        await hideModal();
-    } else if (key.key == "Enter" && activated) {
+    }
+}
+
+async function pointerLockControls(e) {
+    if (activated && e.button === 0) {
         await confirmChoice();
     }
-});
+}
 
-window.onkeydown = function (e) {
-    if (activated) {
-        return !(e.key == "Spacebar" || e.key == " " || e.key == "Enter");
+
+function submitReview() {
+    let submitButton = $(selectedReviewcard).find("button:visible:contains('Reply to this review')");
+    //$(submitButton).trigger("click");
+}
+
+
+
+async function handleHistoryStateChange(){
+    let url = window.location.href;
+    console.log(onReviewPage);
+    if (onReviewPage){
+        if (!url.endsWith("reviews")){
+            await endFromHistoryStateChange();
+        }
     }
-};
+    else {
+        if (url.endsWith("reviews")){
+            await startFromHistoryStateChange();
+        }
+    }
+    onReviewPage = window.location.href.endsWith("reviews");
+}
 
 chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
-    if (request?.reason === "updated") {
-        await Start();
-    } else if (request?.reason === "new template") {
-
+    if (request?.reason === "new template") {
     } else if (request?.reason === "hideNav") {
         NavIsShown = !request.checked;
     } else if (request?.reason === "isNavShown") {
         sendResponse({"NavIsShown": NavIsShown});
+    } else if (request?.reason === "HistoryStateUpdated") {
+        await handleHistoryStateChange();
     }
 });

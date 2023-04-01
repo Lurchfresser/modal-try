@@ -8,9 +8,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="focus-mode" />
     <orderEntry type="library" name="@types/chrome" level="application" />
-    <orderEntry type="module" module-name="reading_time" />
     <orderEntry type="library" name="@types/jquery" level="application" />
   </component>
 </module>
