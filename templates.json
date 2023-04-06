@@ -16,22 +16,63 @@
               "1": {
                 "depthlevel": 0,
                 "text": "This is a test for tab 2.1",
-                "header": "tab 1"
+                "header": "tab 2.1"
               },
               "2": {
-                "depthlevel": 0,
-                "text": "This is a test for tab 2.2",
-                "header": "tab 2"
+                "depthlevel": 2,
+                "header": "tab 2.2",
+                "tabs": {
+                  "1": {
+                    "depthlevel": 0,
+                    "text": "This is a test for tab 3.1",
+                    "header": "tab 3.1"
+                  },
+                  "2": {
+                    "depthlevel": 0,
+                    "text": "This is a test for tab 3.2",
+                    "header": "tab 3.2"
+                  },
+                  "3": {
+                    "depthlevel": 0,
+                    "text": "This is a test for tab 3.3",
+                    "header": "tab 3.3"
+                  },
+                  "4": {
+                    "depthlevel": 0,
+                    "text": "This is a test for tab 3.4",
+                    "header": "tab 3.4"
+                  },
+                  "5": {
+                    "depthlevel": 1,
+                    "texts": ["vielen Dank für Ihr Feedback. ","vielen Dank für Ihre positive Rezension. ","vielen Dank für Ihre tolle Bewertung. "],
+                    "header": "Danke2"
+                  },
+                  "6": {
+                    "depthlevel": 0,
+                    "text": "This is a test for tab 3.6",
+                    "header": "tab 3.6"
+                  },
+                  "7": {
+                    "depthlevel": 0,
+                    "text": "This is a test for tab 3.7",
+                    "header": "tab 3.7"
+                  },
+                  "8": {
+                    "depthlevel": 0,
+                    "text": "This is a test for tab 3.8",
+                    "header": "tab 3.8"
+                  }
+                }
               },
               "3": {
                 "depthlevel": 0,
                 "text": "This is a test for tab 2.3",
-                "header": "tab 3"
+                "header": "tab 2.3"
               },
               "4": {
                 "depthlevel": 0,
                 "text": "This is a test for tab 2.4",
-                "header": "tab 4"
+                "header": "tab 2.4"
               },
               "5": {
                 "depthlevel": 1,
@@ -41,17 +82,17 @@
               "6": {
                 "depthlevel": 0,
                 "text": "This is a test for tab 2.6",
-                "header": "tab 6"
+                "header": "tab 2.6"
               },
               "7": {
                 "depthlevel": 0,
                 "text": "This is a test for tab 2.7",
-                "header": "tab 7"
+                "header": "tab 2.7"
               },
               "8": {
                 "depthlevel": 0,
                 "text": "This is a test for tab 2.8",
-                "header": "tab 8"
+                "header": "tab 2.8"
               }
             }
           },

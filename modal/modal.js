@@ -38,7 +38,7 @@ async function Start() {
 
     window.addEventListener("keydown", modalKeyControls);
 
-    window.addEventListener("mouseup", pointerLockControls);
+    window.addEventListener("mouseup", modalMouseControls);
 
     loadObserver.observe(document.documentElement, {childList: true, subtree: true});
 
@@ -68,7 +68,7 @@ async function startFromHistoryStateChange() {
 
     window.addEventListener("keydown", modalKeyControls);
 
-    window.addEventListener("mouseup", pointerLockControls);
+    window.addEventListener("mouseup", modalMouseControls);
 
     await Start();
 }
@@ -76,7 +76,6 @@ async function startFromHistoryStateChange() {
 async function endFromHistoryStateChange() {
     loadObserver.disconnect();
     reviewObserver.disconnect();
-    reviewCardContainerSet.clear();
     reviewContentBody = undefined;
     selectedReviewcard = undefined;
 
@@ -90,7 +89,7 @@ async function endFromHistoryStateChange() {
     document.removeEventListener("pointerlockchange", lockChangeAlert);
     window.removeEventListener("mousemove", pointerLockMouseMove);
     window.removeEventListener("keydown", modalKeyControls);
-    window.removeEventListener("mouseup", pointerLockControls);
+    window.removeEventListener("mouseup", modalMouseControls);
 }
 
 function append() {
@@ -98,7 +97,6 @@ function append() {
 }
 
 
-let reviewCardContainerSet = new Set;
 //check if the review containing div has been loaded
 let loadObserver = new MutationObserver(function (mutations) {
     if (document.getElementsByClassName("maingrid__content content").length !== 0) {
@@ -117,7 +115,6 @@ let reviewObserver = new MutationObserver(function (mutations) {
         if (mutation.addedNodes.length >= 0 || mutation.removedNodes.length >= 0) {
             for (let addedNote of mutation.addedNodes) {
                 if (addedNote.className === "reviewcard__starrating") {
-                    reviewCardContainerSet.add(addedNote.parentElement.parentElement.parentElement);
                     addedNote.parentElement.parentElement.parentElement.onmouseenter = (e) => {
                         selectReviewcard(e)
                     };
@@ -133,7 +130,6 @@ let reviewObserver = new MutationObserver(function (mutations) {
                 if (removedNode.tagName === "DIV" && removedNode?.firstElementChild?.firstElementChild?.firstElementChild.className === "reviewcard__container") {
                     removedNode.firstElementChild.firstElementChild.firstElementChild.removeEventListener("onmouseenter", selectReviewcard);
                     removedNode.firstElementChild.firstElementChild.firstElementChild.removeEventListener("onmouseleave", deSelectReviewcard);
-                    reviewCardContainerSet.delete(removedNode.firstElementChild.firstElementChild.firstElementChild);
                 }
             }
         }
@@ -161,59 +157,54 @@ function deSelectReviewcard(e) {
     e.target.removeEventListener("click", startModal);
 }
 
+let pointerLockAvailable = true;
+//so startModal doesnt get executed, when it is waiting for the Pointerlock to become available again
+let isStartModalRunning = false;
 //Antwort abschicken, Reviewcard global varaible, delete textarea
 async function startModal(e) {
+    let target = $(e.target);
     //if is for the cancelbutton and textarea to work without triggering the modal
-    if (!($(e.target).text().trim() === "Cancel" && $(e.target).prop("tagName") === "BUTTON") && !e.target.contains(document.getElementsByClassName("reviewcard__replywrap")[0])) {
-        //for loop because the hidden buttons also have the same classname(but not same classlist -> if(classlist.lenght))
+    if (!(target.text().trim() === "Cancel" && target.prop("tagName") === "BUTTON")
+    && !isStartModalRunning && !target.parents(".reviewcard__replywrap")[0]) {
+        console.log("StartModal");
+        isStartModalRunning = true;
+        let replyButton = $(this).find(".reviewcard__reviewfooter__reply:visible:contains(' Reply')")[0];
+        let editReplyButton = $(this).find(".button.is-smaller.is-outlined-primary:visible")[0];
         //this is for unanswered reviews
-        for (let Element of this.getElementsByClassName("reviewcard__reviewfooter__reply")) {
-            if (Element.classList.length === 1) {
-                //remove and add Eventlistener, because the clickfunction would trigger the function recursivly
-                this.removeEventListener("click", startModal);
-                Element.click();
-                this.addEventListener("click", startModal);
-                //textarea needs 1 milisec to be loaded
-                let temp;
-                while (!temp) {
-                    await sleep(1);
-                    if (this.querySelector("textarea")) {
-                        temp = true;
-                    }
-                }
-                replyTextArea = this.querySelector("textarea");
+        if (replyButton) {
+            //remove and add Eventlistener, because the clickfunction would trigger the function recursivly
+            this.removeEventListener("click", startModal);
+            replyButton.click();
+            this.addEventListener("click", startModal);
+            //textarea needs 1 milisec to be loaded
 
-                replyTextArea.value = "Hallo " + replyTextArea.value;
-                await positionModal(this);
-                return undefined;
-            }
         }
-        //this is for edit reply
-        for (let Element2 of this.getElementsByClassName("button is-smaller is-outlined-primary")) {
-            if (Element2.classList.length === 3) {
-                this.removeEventListener("click", startModal);
-                Element2.click();
-                this.addEventListener("click", startModal);
-                let temp2;
-                while (!temp2) {
-                    await sleep(1);
-                    if (this.querySelector("textarea")) {
-                        temp2 = true;
-                    }
-                }
-
-                replyTextArea = this.querySelector("textarea");
-                await positionModal(this);
-                return undefined;
-            }
+        //this is for answered reviews
+        else if (editReplyButton) {
+            this.removeEventListener("click", startModal);
+            editReplyButton.click();
+            this.addEventListener("click", startModal);
         }
-        //for already opened Reviews
         replyTextArea = this.querySelector("textarea");
-        if (this.getElementsByClassName("reviewcard__replyheader")[0] && e.target !== replyTextArea) {
-            replyTextArea.selectionStart = replyTextArea.selectionEnd = replyTextArea.value.length;
-            await positionModal(this);
+        let temp;
+        while (!temp) {
+            await sleep(1);
+            if (this.querySelector("textarea")) {
+                temp = true;
+            }
         }
-
+        replyTextArea = this.querySelector("textarea");
+        if (!replyTextArea.value.startsWith("Hallo")) {
+            replyTextArea.value = "Hallo " + replyTextArea.value;
+        }
+        //set caret at the End
+        replyTextArea.selectionStart = replyTextArea.selectionEnd = replyTextArea.value.length;
+        //waits until pointerlock is available after exiting it
+        if (pointerLockAvailable instanceof Promise){
+            await pointerLockAvailable;
+        }
+        await positionModal(this);
+        isStartModalRunning = false;
     }
 }
 
@@ -264,9 +255,8 @@ async function positionModal(reviewCard) {
         if (X && Y) {
             await showModal(X, Y);
         } else {
-            let textarea = $(reviewCard).find("textarea")[0];
-            textarea.scrollIntoView({block: "start", inline: "end"});
-            rect = textarea.getBoundingClientRect();
+            replyTextArea.scrollIntoView({block: "start", inline: "end"});
+            rect = replyTextArea.getBoundingClientRect();
             testModalPosition();
             if (X && Y) {
                 await showModal(X, Y);
@@ -307,14 +297,18 @@ function isRoomForModal(X, Y) {
 
 
 async function showModal(X, Y) {
-    modalSelected = 4;
-    lastSelectedX = [];
-    lastSelectedY = [];
-    modalClass.show(X, Y, modalSelected);
-    activated = true;
-    //firefox akzeptiert nicht, später ändern
-    await modal.requestPointerLock();
-    modalClass.showChoice(template);
+    if (!document.pointerLockElement) {
+        await modal.requestPointerLock();
+        pointerLockAvailable = false;
+        modalSelected = 4;
+        lastSelectedX = [];
+        lastSelectedY = [];
+        modalClass.show(X, Y, modalSelected);
+        activated = true;
+        modalClass.showChoice(template);
+    } else {
+        throw new Error("A pointerLockElement exists already");
+    }
 }
 
 async function hideModal() {
@@ -421,10 +415,30 @@ function scrollContentIntoView(Element, scrollableParent) {
     scrollableParent.scrollBy(-X, -Y);
 }
 
+function findParentObject(obj, containingObject) {
+    let cache;
+    if (Object.values(containingObject["tabs"]).includes(obj)) {
+        return containingObject;
+    } else {
+        if (containingObject["tabs"]) {
+            Object.values(containingObject["tabs"]).forEach(val => {
+                if (val["tabs"]) {
+                    cache = findParentObject(obj, val);
+                    if (cache) {
+                        return cache;
+                    }
+                }
+            })
+        }
+    }
+    return cache;
+}
+
 
 async function lockChangeAlert() {
     if (!(document.pointerLockElement === modal) && activated) {
-        //await hideModal();
+        pointerLockAvailable = new Promise(resolve => setTimeout(resolve, 1300));
+        await hideModal();
     }
 }
 
@@ -442,11 +456,17 @@ async function modalKeyControls(keyboardEvent) {
             submitReview();
         } else if (key === "Escape") {
             await hideModal();
+            pointerLockAvailable = true;
+        } else if (key === "Dead") {
+            keyboardEvent.preventDefault();
+            let temp = findParentObject(template, defaultTemplate);
+            if (temp) {
+                template = temp;
+                modalClass.showChoice(template);
+            }
         }
     } else if ((key === "m" || key === "M") && keyboardEvent.ctrlKey) {
-        if (activated) {
-            await hideModal()
-        } else if (preActivated) {
+        if (preActivated) {
             preActivated = false;
         } else if (!preActivated) {
             preActivated = true;
@@ -454,7 +474,7 @@ async function modalKeyControls(keyboardEvent) {
     }
 }
 
-async function pointerLockControls(e) {
+async function modalMouseControls(e) {
     if (activated && e.button === 0) {
         await confirmChoice();
     }
@@ -467,17 +487,14 @@ function submitReview() {
 }
 
 
-
-async function handleHistoryStateChange(){
+async function handleHistoryStateChange() {
     let url = window.location.href;
-    console.log(onReviewPage);
-    if (onReviewPage){
-        if (!url.endsWith("reviews")){
+    if (onReviewPage) {
+        if (!url.endsWith("reviews")) {
             await endFromHistoryStateChange();
         }
-    }
-    else {
-        if (url.endsWith("reviews")){
+    } else {
+        if (url.endsWith("reviews")) {
             await startFromHistoryStateChange();
         }
     }
