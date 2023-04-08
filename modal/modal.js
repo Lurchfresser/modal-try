@@ -78,6 +78,7 @@ async function endFromHistoryStateChange() {
     reviewObserver.disconnect();
     reviewContentBody = undefined;
     selectedReviewcard = undefined;
+    userName = undefined;
 
     replyTextArea = undefined;
 
@@ -137,10 +138,13 @@ let reviewObserver = new MutationObserver(function (mutations) {
 });
 
 let selectedReviewcard;
+let userName;
 
 function selectReviewcard(e) {
     if (preActivated) {
         selectedReviewcard = e.target;
+        userName = $(selectedReviewcard).find(".reviewcard__username").text().trim();
+        console.log(userName);
         e.target.style.border = "1px solid black";
         //ist glaube ich nicht ganz der korrekte borderRadius
         e.target.style.borderRadius = "5px";
@@ -151,6 +155,7 @@ function selectReviewcard(e) {
 function deSelectReviewcard(e) {
     if (selectedReviewcard === e.target) {
         selectedReviewcard = undefined;
+        userName = undefined;
     }
     e.target.style.borderWidth = "0px";
 
@@ -160,13 +165,13 @@ function deSelectReviewcard(e) {
 let pointerLockAvailable = true;
 //so startModal doesnt get executed, when it is waiting for the Pointerlock to become available again
 let isStartModalRunning = false;
+
 //Antwort abschicken, Reviewcard global varaible, delete textarea
 async function startModal(e) {
     let target = $(e.target);
     //if is for the cancelbutton and textarea to work without triggering the modal
     if (!(target.text().trim() === "Cancel" && target.prop("tagName") === "BUTTON")
-    && !isStartModalRunning && !target.parents(".reviewcard__replywrap")[0]) {
-        console.log("StartModal");
+        && !isStartModalRunning && !target.parents(".reviewcard__replywrap")[0]) {
         isStartModalRunning = true;
         let replyButton = $(this).find(".reviewcard__reviewfooter__reply:visible:contains(' Reply')")[0];
         let editReplyButton = $(this).find(".button.is-smaller.is-outlined-primary:visible")[0];
@@ -177,7 +182,6 @@ async function startModal(e) {
             replyButton.click();
             this.addEventListener("click", startModal);
             //textarea needs 1 milisec to be loaded
-
         }
         //this is for answered reviews
         else if (editReplyButton) {
@@ -185,26 +189,43 @@ async function startModal(e) {
             editReplyButton.click();
             this.addEventListener("click", startModal);
         }
-        replyTextArea = this.querySelector("textarea");
-        let temp;
-        while (!temp) {
-            await sleep(1);
-            if (this.querySelector("textarea")) {
-                temp = true;
-            }
-        }
-        replyTextArea = this.querySelector("textarea");
-        if (!replyTextArea.value.startsWith("Hallo")) {
-            replyTextArea.value = "Hallo " + replyTextArea.value;
-        }
-        //set caret at the End
-        replyTextArea.selectionStart = replyTextArea.selectionEnd = replyTextArea.value.length;
         //waits until pointerlock is available after exiting it
-        if (pointerLockAvailable instanceof Promise){
+        if (pointerLockAvailable instanceof Promise) {
             await pointerLockAvailable;
         }
+        await handleTextarea(this);
         await positionModal(this);
         isStartModalRunning = false;
+    }
+}
+
+async function handleTextarea(that){
+    replyTextArea = that.querySelector("textarea");
+    //if review is unopened, textarea needs a bit of time to open
+    while (!replyTextArea) {
+        await sleep(1);
+        replyTextArea = that.querySelector("textarea");
+    }
+    replyTextArea.focus({preventScroll:true});
+    if (!replyTextArea.value.startsWith("Hallo")) {
+        if (userName !== ""){
+            replyTextArea.value = "Hallo " + userName + ", ";
+        }
+        else replyTextArea.value = "Hallo, ";
+    }
+    //separate if statement, because it could already been set
+    if (replyTextArea.value.startsWith("Hallo, ")){
+        replyTextArea.selectionStart = replyTextArea.selectionEnd = "Hallo, ".length;
+    }
+    else if (replyTextArea.value.startsWith("Hallo " + userName + ", ")){
+        replyTextArea.selectionStart = replyTextArea.selectionEnd = ("Hallo " + userName + ", ").length;
+    }
+    else if (replyTextArea.value.indexOf(", ") !== -1){
+        replyTextArea.selectionStart = replyTextArea.selectionEnd = replyTextArea.value.indexOf(", ") + 2;
+    }
+    else {
+        //set caret at the End
+        replyTextArea.selectionStart = replyTextArea.selectionEnd = replyTextArea.value.length;
     }
 }
 
@@ -366,14 +387,26 @@ function select(e) {
 let replyTextArea;
 
 async function confirmChoice() {
-    let InputEvent = new Event("input", {bubbles: true, cancelable: true});
-    replyTextArea.dispatchEvent(InputEvent);
     let tab = template.tabs[modalClass.divToTemplate(modalSelected)];
-    if (tab["depthlevel"] !== 2) {
-        replyTextArea.value += modalClass.output(tab);
-    } else if (tab["depthlevel"] === 2) {
-        template = tab;
-        modalClass.showChoice(template);
+    //check if tab exists
+    if (tab?.["depthlevel"] !== undefined) {
+        if (tab["depthlevel"] !== 2) {
+            let caretPoisition = replyTextArea.selectionEnd;
+            let reply = replyTextArea.value;
+            //text gets inserted at caret position
+            replyTextArea.value = reply.substr(0,caretPoisition) + modalClass.output(tab) + reply.substr(caretPoisition);
+            //caret is now behind the inserted text
+            replyTextArea.selectionEnd = replyTextArea.selectionStart = caretPoisition + modalClass.output(tab).length;
+            //so the textarea srcolls always to the caret position
+            replyTextArea.blur();
+            replyTextArea.focus();
+            let InputEvent = new Event("input", {bubbles: true, cancelable: true});
+            //so replybutton becomes clickable
+            replyTextArea.dispatchEvent(InputEvent);
+        } else if (tab["depthlevel"] === 2) {
+            template = tab;
+            modalClass.showChoice(template);
+        }
     }
 }
 

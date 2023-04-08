@@ -4,7 +4,7 @@ document.getElementById("changebtn").addEventListener("click", async () => {
         text: sel.options[sel.selectedIndex].text,
         tabId: currentTab.id
     });
-    if (!currentTab.url.startsWith("chrome")) {
+    if (currentTab.url.startsWith("https://web.appradar.com/")) {
         await chrome.tabs.sendMessage(
             currentTab.id, {
                 "template": sel.options[sel.selectedIndex].text,
@@ -14,7 +14,7 @@ document.getElementById("changebtn").addEventListener("click", async () => {
     }
 });
 document.getElementById("hideNav").addEventListener("change", async e => {
-    if (currentTab.url.startsWith("https://web.appradar.com/projects/") && currentTab.url.endsWith("reviews")) {
+    if (currentTab.url.startsWith("https://web.appradar.com/projects/")) {
         await chrome.tabs.sendMessage(
             currentTab.id, {
                 "template": sel.options[sel.selectedIndex].text,
@@ -49,7 +49,7 @@ window.onload = async () => {
         option.textContent = templates[i].name;
         sel.appendChild(option);
     }
-    if (!currentTab.url.startsWith("chrome")) {
+    if (currentTab.url.startsWith("https://web.appradar.com/")) {
         await chrome.tabs.sendMessage(
             currentTab.id, {
                 "reason": "isNavShown",
