@@ -11,7 +11,9 @@ let modal;
 window.onload = async function importModule() {
     const src = chrome.runtime.getURL('modules/modalStyle.js');
     modalImport = await import(src);
-    modalClass = new modalImport.default;
+    const css = (await chrome.storage.local.get("modalCSS"))["modalCSS"];
+    const html = (await chrome.storage.local.get("modalHTML"))["modalHTML"];
+    modalClass = new modalImport.default(html,css);
     modal = modalClass.modal;
     if (window.location.href.endsWith("reviews")) {
         await Start();
@@ -57,7 +59,7 @@ async function startFromHistoryStateChange() {
     modalClass = new modalImport.default;
     modal = modalClass.modal;
 
-    modalSelected = 4;
+    modalSelected = 9;
 
     lastSelectedX = [];
     lastSelectedY = [];
@@ -94,7 +96,7 @@ async function endFromHistoryStateChange() {
 }
 
 function append() {
-    document.querySelector("body").appendChild(modalClass.modal);
+    document.querySelector("body").appendChild(modalClass.shadow);
 }
 
 
@@ -144,9 +146,8 @@ function selectReviewcard(e) {
     if (preActivated) {
         selectedReviewcard = e.target;
         userName = $(selectedReviewcard).find(".reviewcard__username").text().trim();
-        console.log(userName);
         e.target.style.border = "1px solid black";
-        //ist glaube ich nicht ganz der korrekte borderRadius
+        //TODO richter border Radius finden
         e.target.style.borderRadius = "5px";
         e.target.addEventListener("click", startModal);
     }
@@ -321,7 +322,7 @@ async function showModal(X, Y) {
     if (!document.pointerLockElement) {
         await modal.requestPointerLock();
         pointerLockAvailable = false;
-        modalSelected = 4;
+        modalSelected = 9;
         lastSelectedX = [];
         lastSelectedY = [];
         modalClass.show(X, Y, modalSelected);
@@ -339,7 +340,7 @@ async function hideModal() {
     template = defaultTemplate;
 }
 
-let modalSelected = 4;
+let modalSelected = 9;
 
 let lastSelectedX = [];
 let lastSelectedY = [];
@@ -362,21 +363,21 @@ function select(e) {
         let angle = Math.degrees(Math.atan2(average(lastSelectedY), average(lastSelectedX)));
 
         if (angle <= 22.5 || angle >= 337.5) {
-            modalSelected = 5;
+            modalSelected = 4;
         } else if (angle <= 67.5) {
-            modalSelected = 8;
+            modalSelected = 5;
         } else if (angle <= 112.5) {
-            modalSelected = 7;
-        } else if (angle <= 157.5) {
             modalSelected = 6;
+        } else if (angle <= 157.5) {
+            modalSelected = 7;
         } else if (angle <= 202.5) {
-            modalSelected = 3;
+            modalSelected = 8;
         } else if (angle <= 247.5) {
-            modalSelected = 0;
-        } else if (angle <= 292.5) {
             modalSelected = 1;
-        } else if (angle <= 337.5) {
+        } else if (angle <= 292.5) {
             modalSelected = 2;
+        } else if (angle <= 337.5) {
+            modalSelected = 3;
         }
 
     }
@@ -387,16 +388,17 @@ function select(e) {
 let replyTextArea;
 
 async function confirmChoice() {
-    let tab = template.tabs[modalClass.divToTemplate(modalSelected)];
+    let tab = template.tabs[modalSelected];
     //check if tab exists
     if (tab?.["depthlevel"] !== undefined) {
         if (tab["depthlevel"] !== 2) {
             let caretPoisition = replyTextArea.selectionEnd;
             let reply = replyTextArea.value;
-            //text gets inserted at caret position
-            replyTextArea.value = reply.substr(0,caretPoisition) + modalClass.output(tab) + reply.substr(caretPoisition);
+            //text gets inserted at caret position, variable, so output.length stays consistent with depthlevel 1
+            let output = modalClass.output(tab)
+            replyTextArea.value = reply.substr(0,caretPoisition) + output + reply.substr(caretPoisition);
             //caret is now behind the inserted text
-            replyTextArea.selectionEnd = replyTextArea.selectionStart = caretPoisition + modalClass.output(tab).length;
+            replyTextArea.selectionEnd = replyTextArea.selectionStart = caretPoisition + output.length;
             //so the textarea srcolls always to the caret position
             replyTextArea.blur();
             replyTextArea.focus();
@@ -469,20 +471,23 @@ function findParentObject(obj, containingObject) {
 
 
 async function lockChangeAlert() {
-    if (!(document.pointerLockElement === modal) && activated) {
+    /*if (!(document.pointerLockElement === modal) && activated) {
         pointerLockAvailable = new Promise(resolve => setTimeout(resolve, 1300));
         await hideModal();
-    }
+    }*/
 }
 
 function pointerLockMouseMove(e) {
-    if (document.pointerLockElement === modal) {
+    if (activated) {
         select(e);
     }
 }
 
 async function modalKeyControls(keyboardEvent) {
     let key = keyboardEvent.key;
+    if (key.toLowerCase() === "g"){
+        append();
+    }
     if (activated) {
         if (key === "Enter") {
             keyboardEvent.preventDefault();

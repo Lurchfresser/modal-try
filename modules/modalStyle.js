@@ -1,6 +1,7 @@
-export default class modal {
-
-    modal;
+export default class modalClass {
+    shadow = document.createElement("div");
+    shadowRoot;
+    modal = document.createElement("div");
     modalContent;
     subModalContents = [];
     primeSubModalColor = "crimson";
@@ -10,68 +11,78 @@ export default class modal {
     depthColor2 = "green";
 
 
-    constructor() {
+    constructor(html, css) {
+        this.shadow.style.display = "none";
+        this.shadow.style.position  = "absolute";
 
-        this.modal = document.createElement("div");
-        this.modalContent = document.createElement("div");
+        this.shadowRoot = this.shadow.attachShadow({mode: "open"});
 
-        for (let i = 0; i < 9; i++) {
-            this.tempSubModal = document.createElement("div");
-            this.modal.appendChild(this.tempSubModal);
-            this.subModalContents.push(this.tempSubModal);
-            this.tempSubModal.style.backgroundColor = this.primeSubModalColor;
-            this.tempSubModal.style.height = "100px";
-            this.tempSubModal.style.width = "100px";
-            this.tempSubModal.style.border = "3px solid";
-            this.tempSubModal.style.boxSizing = "border-box";
-            this.tempSubModal.id = this.divToTemplate(i);
-        }
+        this.modal.innerHTML = html;
+        this.shadowRoot.appendChild(this.modal);
 
-        this.modal.style.backgroundColor = "aqua";
-        this.modal.style.height = "300px";
-        this.modal.style.width = "300px";
-        this.modal.style.display = "none";
-        this.modal.style.flexWrap = "wrap";
-        this.modal.style.justifyContent = "space-between";
-        this.modal.style.position = "fixed";
-        this.modal.style.boxSizing = "inherit";
-        this.modal.style.zIndex = "2147483647";
+        let modalStyleTag = document.createElement("style");
+        modalStyleTag.innerHTML = css;
+        this.shadowRoot.appendChild(modalStyleTag);
 
+        $(this.modal).find(".submodalcontent")
+            .each((index, subModalContent) => this.subModalContents.push(subModalContent));
+
+        this.subModalContents.sort((a,b)=>{
+            if (a.id < b.id){return -1;}
+            else            {return 1}
+        })
     }
 
-    getWidth(){
-        return $(this.modal).outerWidth();
+    getWidth() {
+        return $(this.shadow).outerWidth();
     };
-    getHeight(){
-        return $(this.modal).outerHeight();
+
+    getHeight() {
+        return $(this.shadow).outerHeight();
     };
 
     hide() {
-        this.modal.style.display = "none";
+        this.shadow.style.display = "none";
     }
 
     show(X, Y, modalSelected) {
         for (let i = 0; i < this.subModalContents.length; i++) {
             this.subModalContents[i].style.backgroundColor = this.primeSubModalColor;
         }
-        this.subModalContents[modalSelected].style.backgroundColor = this.secondSubModalColor;
-        this.modal.style.display = "flex";
-        this.modal.style.left = (X).toString() + "px";
-        this.modal.style.top = (Y).toString() + "px";
+        this.subModalContents[modalSelected-1].style.backgroundColor = this.secondSubModalColor;
+        this.shadow.style.display = "block";
+        this.shadow.style.left = (X).toString() + "px";
+        this.shadow.style.top = (Y).toString() + "px";
     }
 
     showChoice(template) {
         for (let tab in template.tabs) {
-            this.subModalContents[this.templateToDiv(tab)].textContent = template.tabs[tab].header;
+            this.subModalContents[parseInt(tab)-1].innerHTML = "";
+
+            let header = document.createElement("h2");
+            header.textContent = template.tabs[tab].header;
+            header.style.height = "20%";
+            header.style.fontSize = "16px";
+            header.style.overflow = "hidden";
+            this.subModalContents[parseInt(tab)-1].appendChild(header);
+
+            let content = document.createElement("div");
+            content.style.overflow = "hidden";
+            let contentwrapper = document.createElement("div");
+            contentwrapper.style.columnWidth = "100px";
+            contentwrapper.style.height = "100%";
+            content.appendChild(contentwrapper);
             switch (template.tabs[tab]["depthlevel"]) {
                 case 2:
-                    this.subModalContents[this.templateToDiv(tab)].style.borderColor = this.depthColor2;
+                    this.subModalContents[parseInt(tab)-1].style.borderColor = this.depthColor2;
                     break;
                 case 1:
-                    this.subModalContents[this.templateToDiv(tab)].style.borderColor = this.depthColor1;
+                    this.subModalContents[parseInt(tab)-1].style.borderColor = this.depthColor1;
                     break;
                 case 0:
-                    this.subModalContents[this.templateToDiv(tab)].style.borderColor = this.depthColor0;
+                    this.subModalContents[parseInt(tab)-1].style.borderColor = this.depthColor0;
+                    contentwrapper.textContent = this.output(template.tabs[tab]);
+                    this.subModalContents[parseInt(tab)-1].appendChild(content);
                     break;
             }
         }
@@ -81,9 +92,8 @@ export default class modal {
         for (let i = 0; i < this.subModalContents.length; i++) {
             this.subModalContents[i].style.backgroundColor = this.primeSubModalColor;
         }
-        this.subModalContents[modalSelected].style.backgroundColor = this.secondSubModalColor;
+        this.subModalContents[modalSelected-1].style.backgroundColor = this.secondSubModalColor;
     }
-
 
     output(tab) {
         if (tab["depthlevel"] === 0) {
@@ -95,61 +105,4 @@ export default class modal {
         }
     }
 
-
-    templateToDiv(tem) {
-        switch (tem) {
-            //eigene funktion um Zahlen zu "übersetzen"
-            case 1:
-            case "1":
-                return 0;
-            case 2:
-            case "2":
-                return 1;
-            case 3:
-            case "3":
-                return 2;
-            case 4:
-            case "4":
-                return 5;
-            case 5:
-            case "5":
-                return 8;
-            case 6:
-            case "6":
-                return 7;
-            case 7:
-            case "7":
-                return 6;
-            case 8:
-            case "8":
-                return 3;
-            case 9:
-            case "9":
-                return 4;
-        }
-    }
-
-    divToTemplate(Div) {
-        switch (Div) {
-            case 0:
-                return "1";
-            case 1:
-                return "2";
-            case 2:
-                return "3";
-            case 3:
-                return "8";
-            case 4:
-                return "9";
-            case 5:
-                return "4";
-            case 6:
-                return "7";
-            case 7:
-                return "6";
-            case 8:
-                return "5";
-
-        }
-    }
 }

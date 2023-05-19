@@ -1,20 +1,25 @@
-##Bugs
+## Bugs
 
 1. borders of Reviewcard not resettet at `Startmodal()`,maybe extra border color, for active Reviewcards? --> better Feedback, while User is waiting for `startModal`
-3. Add destroys `isModalVisible` calculation
-5. dead key for going one level up still inputs ^
+2. Add destroys `isModalVisible` calculation
+3. dead key for going one level up still inputs ^
+4. Modal appears sometimes only after reload of the page
 
 
 
 
-##Think of
+## Think of
 1. readjust scroll, when Reviews are sent (when reviecard gets deleted)
 2. adjust scrolling of Reviewbody when text gets added
 3. rewrite `reviewObserver`
 4. Set focus on textarea at `startModal`
+5. look at [Shared modules - Chrome Developers.url](..%2F..%2FAppData%2FLocal%2FTemp%2FShared%20modules%20-%20Chrome%20Developers.url)
+
+## Ideas
+1. Make selected tab bigger with css animation --> no selvtioncolor needed
 
 
-##Controls
+## Controls
 1. select tab with `left click`
 2. alternative tab option with `right click`
 3. send answer with `enter`
@@ -31,3 +36,4 @@
 6. 4. get username from header, not from textarea (when name is deleted by modaluser or when there is no name)
 7. Error: Receiving end does not exist
 8. adjust scrolling of textarea when text gets added
+9. Caret position not always at the end with depthlevel 1

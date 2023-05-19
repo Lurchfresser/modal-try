@@ -5,6 +5,7 @@ let template;
 
 let modalClass;
 let modal;
+let shadow;
 
 window.onload = async () => {
     await getTemplates();
@@ -23,8 +24,11 @@ async function getTemplates() {
 async function getModules() {
     const src = chrome.runtime.getURL('modules/modalStyle.js');
     let modalImport = await import(src);
-    modalClass = new modalImport.default;
+    const css = (await chrome.storage.local.get("modalCSS"))["modalCSS"];
+    const html = (await chrome.storage.local.get("modalHTML"))["modalHTML"];
+    modalClass = new modalImport.default(html,css);
     modal = modalClass.modal;
+    shadow = modalClass.shadow;
 }
 
 function buildSelection() {
@@ -37,21 +41,22 @@ function buildSelection() {
 }
 
 function buildModal() {
-    document.getElementById("template_container").appendChild(modal);
-    modalClass.show(0, 0, 4);
-    modal.style.position = "inherit";
+    document.getElementById("template_container").appendChild(shadow);
+    modalClass.show(0, 0, 9);
+    shadow.style.position = "inherit";
     loadTemplate();
-    modal.onmouseover = (e) => {
-        modalClass.select(modalClass.templateToDiv(parseInt(e.target.id)));
-    }
-    modal.onclick = (e) => {
-        if (e.target.parentElement === modal &&
-            template.tabs[e.target.id]?.["depthlevel"] === 2) {
-            template = template.tabs[[e.target.id]];
-            modalClass.showChoice(template);
-        } else {
-            if (template.tabs?.[e.target.id]) {
-                document.getElementById("textarea_test").value += modalClass.output(template.tabs[e.target.id]);
+    for (let subModalContent of modalClass.subModalContents){
+        let id = parseInt(subModalContent.id);
+        //for interacting with the tab and seeing the color
+        subModalContent.onmouseover = (e)=>{modalClass.select(id)};
+        //for adding the text to the test-textarea or going down 1 tab
+        subModalContent.onclick = (e)=>{
+            if (template.tabs[id]["depthlevel"] === 2){
+                template = template.tabs[id];
+                modalClass.showChoice(template);
+            }
+            else {
+                document.getElementById("textarea_test").value += modalClass.output(template.tabs[id]);
             }
         }
     }
@@ -70,7 +75,6 @@ function buildContextMenu() {
             editedTab = template.tabs[contextMenuTarget.id];
         }
         else {editedTab = undefined;}
-        console.log(template.tabs?.[contextMenuTarget.id]);
         editTemplate();
     }
 }
@@ -128,7 +132,6 @@ async function submitChange(){
                     }
                     if (temp){
                         editedTab["texts"] = input;
-                        console.log(editedTab["texts"]);
                     }
                     else {
                         alert("Ungültiges Format");

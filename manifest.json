@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "App Radar pro",
+  "name": "App Radar pro dev",
   "description": "Write replys faster",
   "version": "0.0.11",
   "icons": {
@@ -36,6 +36,7 @@
     "browser_style": true,
     "chrome_style": true
   },
-  "permissions": ["activeTab","scripting","tabs","storage","webNavigation"],
+  "options_page": "settings/settings.html",
+  "permissions": ["scripting","tabs","storage","webNavigation"],
   "host_permissions": ["https://web.appradar.com/*"]
 }
