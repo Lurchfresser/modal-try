@@ -8,13 +8,14 @@
     <link rel="stylesheet" href="settings.css">
 </head>
 <body>
+<button id="test">test</button>
 <select id="templates">
 </select>
 <button>
-<svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512" id="add">
-    <path xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round"
-          stroke-linejoin="round" stroke-width="32" d="M256 112v288M400 256H112"></path>
-</svg>
+    <svg xmlns="http://www.w3.org/2000/svg" class="ionicon" viewBox="0 0 512 512" id="add">
+        <path xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round"
+              stroke-linejoin="round" stroke-width="32" d="M256 112v288M400 256H112"></path>
+    </svg>
 </button>
 <br>
 <label for="textarea_test">Test Textarea</label>
@@ -25,14 +26,22 @@
         <div id="contextMenuDelete">Delete</div>
     </div>
 </div>
-    <select>
+<fieldset>
+    <select id="depthlevel_select" disabled>
+        <option value="u" selected>Tabart auswählen</option>
         <option value="0">Text</option>
-        <option value=1>zufälliger Text</option>
-        <option value=2>Unterauswahl</option>
+        <option value="1">zufälliger Text</option>
+        <option value="2">Unterauswahl</option>
     </select>
-    <textarea id="textarea_edit"></textarea>
-    <input type="color">
+    <br>
+    <label for="header">Header</label>
+    <br>
+    <input type="text" id="header" disabled>
+    <br>
+    <textarea id="textarea_edit" disabled></textarea>
+    <input type="color" disabled id="body_color"value="#000000">
     <button id="submitChange">bestätigen</button>
-    <button id="cancelChange">abbrechen</button>
+    <button id="discardChange">abbrechen</button>
+</fieldset>
 </body>
 </html>

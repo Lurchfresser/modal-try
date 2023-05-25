@@ -23,7 +23,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
                 // The API call was successful!
                 return response.text();
             })
-            .then((data) => {chrome.storage.local.set({modalCSS: data});console.log(data)});
+            .then((data) => chrome.storage.local.set({modalCSS: data}));
     }
 });
 

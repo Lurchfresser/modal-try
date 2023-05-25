@@ -14,6 +14,7 @@
 3. rewrite `reviewObserver`
 4. Set focus on textarea at `startModal`
 5. look at [Shared modules - Chrome Developers.url](..%2F..%2FAppData%2FLocal%2FTemp%2FShared%20modules%20-%20Chrome%20Developers.url)
+6. When opening to many Reviews to fast, the names get messed up or are undefined
 
 ## Ideas
 1. Make selected tab bigger with css animation --> no selvtioncolor needed

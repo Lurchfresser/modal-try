@@ -9,11 +9,12 @@ export default class modalClass {
     depthColor0 = "black";
     depthColor1 = "blue";
     depthColor2 = "green";
+    depthColorU = "grey";
 
 
     constructor(html, css) {
         this.shadow.style.display = "none";
-        this.shadow.style.position  = "absolute";
+        this.shadow.style.position = "absolute";
 
         this.shadowRoot = this.shadow.attachShadow({mode: "open"});
 
@@ -27,9 +28,12 @@ export default class modalClass {
         $(this.modal).find(".submodalcontent")
             .each((index, subModalContent) => this.subModalContents.push(subModalContent));
 
-        this.subModalContents.sort((a,b)=>{
-            if (a.id < b.id){return -1;}
-            else            {return 1}
+        this.subModalContents.sort((a, b) => {
+            if (a.id < b.id) {
+                return -1;
+            } else {
+                return 1
+            }
         })
     }
 
@@ -45,26 +49,35 @@ export default class modalClass {
         this.shadow.style.display = "none";
     }
 
-    show(X, Y, modalSelected) {
+    show(X, Y, modalSelected, template) {
         for (let i = 0; i < this.subModalContents.length; i++) {
-            this.subModalContents[i].style.backgroundColor = this.primeSubModalColor;
+            if (template["tabs"][(i + 1).toString()]) {
+                this.subModalContents[i].style.backgroundColor = template["tabs"][(i + 1).toString()]["bodyColor"];
+            } else {
+                this.subModalContents[i].style.backgroundColor = this.primeSubModalColor;
+            }
         }
-        this.subModalContents[modalSelected-1].style.backgroundColor = this.secondSubModalColor;
+        this.subModalContents[modalSelected - 1].style.backgroundColor = this.secondSubModalColor;
         this.shadow.style.display = "block";
         this.shadow.style.left = (X).toString() + "px";
         this.shadow.style.top = (Y).toString() + "px";
     }
 
     showChoice(template) {
+        //for clearing the modal, if not all templates are defined
+        for (let subModalContent of this.subModalContents) {
+            subModalContent.innerHTML = "";
+            subModalContent.style.borderColor = this.depthColorU;
+        }
+
         for (let tab in template.tabs) {
-            this.subModalContents[parseInt(tab)-1].innerHTML = "";
 
             let header = document.createElement("h2");
             header.textContent = template.tabs[tab].header;
             header.style.height = "20%";
             header.style.fontSize = "16px";
             header.style.overflow = "hidden";
-            this.subModalContents[parseInt(tab)-1].appendChild(header);
+            this.subModalContents[parseInt(tab) - 1].appendChild(header);
 
             let content = document.createElement("div");
             content.style.overflow = "hidden";
@@ -74,15 +87,15 @@ export default class modalClass {
             content.appendChild(contentwrapper);
             switch (template.tabs[tab]["depthlevel"]) {
                 case 2:
-                    this.subModalContents[parseInt(tab)-1].style.borderColor = this.depthColor2;
+                    this.subModalContents[parseInt(tab) - 1].style.borderColor = this.depthColor2;
                     break;
                 case 1:
-                    this.subModalContents[parseInt(tab)-1].style.borderColor = this.depthColor1;
+                    this.subModalContents[parseInt(tab) - 1].style.borderColor = this.depthColor1;
                     break;
                 case 0:
-                    this.subModalContents[parseInt(tab)-1].style.borderColor = this.depthColor0;
+                    this.subModalContents[parseInt(tab) - 1].style.borderColor = this.depthColor0;
                     contentwrapper.textContent = this.output(template.tabs[tab]);
-                    this.subModalContents[parseInt(tab)-1].appendChild(content);
+                    this.subModalContents[parseInt(tab) - 1].appendChild(content);
                     break;
             }
         }
@@ -90,9 +103,15 @@ export default class modalClass {
 
     select(modalSelected) {
         for (let i = 0; i < this.subModalContents.length; i++) {
-            this.subModalContents[i].style.backgroundColor = this.primeSubModalColor;
+            if (template["tabs"][(i + 1).toString()]) {
+                this.subModalContents[i].style.backgroundColor = template["tabs"][(i + 1).toString()]["bodyColor"];
+            } else {
+                this.subModalContents[i].style.backgroundColor = this.primeSubModalColor;
+            }
         }
-        this.subModalContents[modalSelected-1].style.backgroundColor = this.secondSubModalColor;
+        if (modalSelected) {
+            this.subModalContents[modalSelected - 1].style.backgroundColor = this.secondSubModalColor;
+        }
     }
 
     output(tab) {

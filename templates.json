@@ -1,179 +1,231 @@
 {
-  "templates":[
-      {
-        "name": "first template",
-        "depthlevel": 2,
-        "tabs": {
-          "1": {
-            "depthlevel": 0,
-            "text": "This is a test for tab 1",
-            "header": "tab 1"
-          },
-          "2": {
-            "depthlevel": 2,
-            "header": "tab 2",
-            "tabs": {
-              "1": {
-                "depthlevel": 0,
-                "text": "This is a test for tab 2.1",
-                "header": "tab 2.1"
-              },
-              "2": {
-                "depthlevel": 2,
-                "header": "tab 2.2",
-                "tabs": {
-                  "1": {
-                    "depthlevel": 0,
-                    "text": "This is a test for tab 3.1",
-                    "header": "tab 3.1"
-                  },
-                  "2": {
-                    "depthlevel": 0,
-                    "text": "This is a test for tab 3.2",
-                    "header": "tab 3.2"
-                  },
-                  "3": {
-                    "depthlevel": 0,
-                    "text": "This is a test for tab 3.3",
-                    "header": "tab 3.3"
-                  },
-                  "4": {
-                    "depthlevel": 0,
-                    "text": "This is a test for tab 3.4",
-                    "header": "tab 3.4"
-                  },
-                  "5": {
-                    "depthlevel": 1,
-                    "texts": ["vielen Dank für Ihr Feedback. ","vielen Dank für Ihre positive Rezension. ","vielen Dank für Ihre tolle Bewertung. "],
-                    "header": "Danke2"
-                  },
-                  "6": {
-                    "depthlevel": 0,
-                    "text": "This is a test for tab 3.6",
-                    "header": "tab 3.6"
-                  },
-                  "7": {
-                    "depthlevel": 0,
-                    "text": "This is a test for tab 3.7",
-                    "header": "tab 3.7"
-                  },
-                  "8": {
-                    "depthlevel": 0,
-                    "text": "This is a test for tab 3.8",
-                    "header": "tab 3.8"
-                  }
+  "templates": [
+    {
+      "depthlevel": 2,
+      "name": "first template",
+      "bodyColor": "#ed143d",
+      "tabs": {
+        "1": {
+          "depthlevel": 0,
+          "header": "tab 1",
+          "text": "This is a test for tab 1",
+          "bodyColor": "#9deded"
+        },
+        "2": {
+          "depthlevel": 2,
+          "header": "tab 2",
+          "bodyColor": "#ed143d",
+          "tabs": {
+            "1": {
+              "depthlevel": 0,
+              "header": "tab 2.1",
+              "text": "This is a test for tab 2.1",
+              "bodyColor": "#ed143d"
+            },
+            "2": {
+              "depthlevel": 2,
+              "header": "tab 2.2",
+              "bodyColor": "#ed143d",
+              "tabs": {
+                "1": {
+                  "depthlevel": 0,
+                  "header": "tab 3.1",
+                  "text": "This is a test for tab 3.1",
+                  "bodyColor": "#ed143d"
+                },
+                "2": {
+                  "depthlevel": 0,
+                  "header": "tab 3.2",
+                  "text": "This is a test for tab 3.2",
+                  "bodyColor": "#ed143d"
+                },
+                "3": {
+                  "depthlevel": 0,
+                  "header": "tab 3.3",
+                  "text": "This is a test for tab 3.3",
+                  "bodyColor": "#ed143d"
+                },
+                "4": {
+                  "depthlevel": 0,
+                  "header": "tab 3.4",
+                  "text": "This is a test for tab 3.4",
+                  "bodyColor": "#ed143d"
+                },
+                "5": {
+                  "depthlevel": 1,
+                  "header": "Danke2",
+                  "texts": [
+                    "vielen Dank für Ihr Feedback. ",
+                    "vielen Dank für Ihre positive Rezension. ",
+                    "vielen Dank für Ihre tolle Bewertung. "
+                  ],
+                  "bodyColor": "#ed143d"
+                },
+                "6": {
+                  "depthlevel": 0,
+                  "header": "tab 3.6",
+                  "text": "This is a test for tab 3.6",
+                  "bodyColor": "#ed143d"
+                },
+                "7": {
+                  "depthlevel": 0,
+                  "header": "tab 3.7",
+                  "text": "This is a test for tab 3.7",
+                  "bodyColor": "#ed143d"
+                },
+                "8": {
+                  "depthlevel": 0,
+                  "header": "tab 3.8",
+                  "text": "This is a test for tab 3.8",
+                  "bodyColor": "#ed143d"
                 }
-              },
-              "3": {
-                "depthlevel": 0,
-                "text": "This is a test for tab 2.3",
-                "header": "tab 2.3"
-              },
-              "4": {
-                "depthlevel": 0,
-                "text": "This is a test for tab 2.4",
-                "header": "tab 2.4"
-              },
-              "5": {
-                "depthlevel": 1,
-                "texts": ["vielen Dank für Ihr Feedback. ","vielen Dank für Ihre positive Rezension. ","vielen Dank für Ihre tolle Bewertung. "],
-                "header": "Danke"
-              },
-              "6": {
-                "depthlevel": 0,
-                "text": "This is a test for tab 2.6",
-                "header": "tab 2.6"
-              },
-              "7": {
-                "depthlevel": 0,
-                "text": "This is a test for tab 2.7",
-                "header": "tab 2.7"
-              },
-              "8": {
-                "depthlevel": 0,
-                "text": "This is a test for tab 2.8",
-                "header": "tab 2.8"
               }
+            },
+            "3": {
+              "depthlevel": 0,
+              "header": "tab 2.3",
+              "text": "This is a test for tab 2.3",
+              "bodyColor": "#ed143d"
+            },
+            "4": {
+              "depthlevel": 0,
+              "header": "tab 2.4",
+              "text": "This is a test for tab 2.4",
+              "bodyColor": "#ed143d"
+            },
+            "5": {
+              "depthlevel": 1,
+              "header": "Danke",
+              "texts": [
+                "vielen Dank für Ihr Feedback. ",
+                "vielen Dank für Ihre positive Rezension. ",
+                "vielen Dank für Ihre tolle Bewertung. "
+              ],
+              "bodyColor": "#ed143d"
+            },
+            "6": {
+              "depthlevel": 0,
+              "header": "tab 2.6",
+              "text": "This is a test for tab 2.6",
+              "bodyColor": "#ed143d"
+            },
+            "7": {
+              "depthlevel": 0,
+              "header": "tab 2.7",
+              "text": "This is a test for tab 2.7",
+              "bodyColor": "#ed143d"
+            },
+            "8": {
+              "depthlevel": 0,
+              "header": "tab 2.8",
+              "text": "This is a test for tab 2.8",
+              "bodyColor": "#ed143d"
             }
-          },
-          "3": {
-            "depthlevel": 0,
-            "text": "This is a test for tab 3",
-            "header": "tab 3"
-          },
-          "4": {
-            "depthlevel": 0,
-            "text": "This is a test for tab 4",
-            "header": "tab 4"
-          },
-          "5": {
-            "depthlevel": 0,
-            "text": "This is a test for tab 5",
-            "header": "tab 5"
-          },
-          "6": {
-            "depthlevel": 0,
-            "text": "This is a test for tab 6",
-            "header": "tab 6"
-          },
-          "7": {
-            "depthlevel": 0,
-            "text": "This is a test for tab 7",
-            "header": "tab 7"
-          },
-          "8": {
-            "depthlevel": 0,
-            "text": "This is a test for tab 8",
-            "header": "tab 8"
           }
-        }
-      },
-      {
-        "name": "second template",
-        "depthlevel": 2,
-        "tabs": {
-          "1": {
-            "depthlevel": 0,
-            "text": "This is a test for tab 1",
-            "header": "tab 1"
-          },
-          "2": {
-            "depthlevel": 0,
-            "text": "This is a test for tab 2",
-            "header": "tab 2"
-          },
-          "3": {
-            "depthlevel": 0,
-            "text": "This is a test for tab 3",
-            "header": "tab 3"
-          },
-          "4": {
-            "depthlevel": 0,
-            "text": "This is a test for tab 4",
-            "header": "tab 4"
-          },
-          "5": {
-            "depthlevel": 0,
-            "text": "This is a test for tab 5",
-            "header": "tab 5"
-          },
-          "6": {
-            "depthlevel": 0,
-            "text": "This is a test for tab 6",
-            "header": "tab 6"
-          },
-          "7": {
-            "depthlevel": 0,
-            "text": "This is a test for tab 7",
-            "header": "tab 7"
-          },
-          "8": {
-            "depthlevel": 0,
-            "text": "This is a test for tab 8",
-            "header": "tab 8"
-          }
+        },
+        "3": {
+          "depthlevel": 0,
+          "header": "wert",
+          "text": "This is a test for tab 3",
+          "bodyColor": "#ed143d"
+        },
+        "4": {
+          "depthlevel": 0,
+          "header": "qwdnhqw",
+          "text": "",
+          "bodyColor": "#ed143d"
+        },
+        "5": {
+          "depthlevel": 1,
+          "header": "tab 5",
+          "texts": [
+            "dqw",
+            "3qg4q"
+          ],
+          "bodyColor": "#ed143d"
+        },
+        "6": {
+          "depthlevel": 0,
+          "header": "tab 6",
+          "text": "This is a test for tab 6",
+          "bodyColor": "#ed143d"
+        },
+        "7": {
+          "depthlevel": 0,
+          "header": "tab 7",
+          "text": "This is a test for tab 7",
+          "bodyColor": "#ed143d"
+        },
+        "8": {
+          "depthlevel": 0,
+          "header": "tab 8",
+          "text": "This is a test for tab 8",
+          "bodyColor": "#ed143d"
         }
       }
+    },
+    {
+      "depthlevel": 2,
+      "name": "second template",
+      "bodyColor": "#ed143d",
+      "tabs": {
+        "1": {
+          "depthlevel": 0,
+          "header": "tab 1",
+          "text": "This is a test for tab 1",
+          "bodyColor": "#ed143d"
+        },
+        "2": {
+          "depthlevel": 0,
+          "header": "tab 2",
+          "text": "This is a test for tab 2",
+          "bodyColor": "#ed143d"
+        },
+        "3": {
+          "depthlevel": 2,
+          "header": "test",
+          "bodyColor": "#ed143d",
+          "tabs": {
+            "3": {
+              "depthlevel": 0,
+              "header": "new template",
+              "text": "This is a new template",
+              "bodyColor": "#ed143d"
+            }
+          }
+        },
+        "4": {
+          "depthlevel": 0,
+          "header": "tab 4",
+          "text": "This is a test for tab 4",
+          "bodyColor": "#ed143d"
+        },
+        "5": {
+          "depthlevel": 0,
+          "header": "tab 5",
+          "text": "This is a test for tab 5",
+          "bodyColor": "#ed143d"
+        },
+        "6": {
+          "depthlevel": 0,
+          "header": "tab 6",
+          "text": "This is a test for tab 6",
+          "bodyColor": "#ed143d"
+        },
+        "7": {
+          "depthlevel": 0,
+          "header": "tab 7",
+          "text": "This is a test for tab 7",
+          "bodyColor": "#ed143d"
+        },
+        "8": {
+          "depthlevel": 0,
+          "header": "tab 8",
+          "text": "This is a test for tab 8",
+          "bodyColor": "#ed143d"
+        }
+      }
+    }
   ],
   "def": "first template"
 }

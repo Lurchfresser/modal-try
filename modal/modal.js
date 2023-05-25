@@ -24,7 +24,7 @@ let defaultTemplate;
 
 async function applyDefaultTemplate() {
     await chrome.storage.local.get(["def"]).then((result) => {
-        template = templates.find(e => e.name = result), () => {
+        template = templates.find(e => e.name === result), () => {
             template = templates[0]
         };
     });
@@ -325,7 +325,7 @@ async function showModal(X, Y) {
         modalSelected = 9;
         lastSelectedX = [];
         lastSelectedY = [];
-        modalClass.show(X, Y, modalSelected);
+        modalClass.show(X, Y, modalSelected, template);
         activated = true;
         modalClass.showChoice(template);
     } else {
