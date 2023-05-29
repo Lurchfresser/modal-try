@@ -57,6 +57,8 @@ export default class modalClass {
                 this.subModalContents[i].style.backgroundColor = this.primeSubModalColor;
             }
         }
+        console.log(modalSelected);
+        console.log(this.subModalContents);
         this.subModalContents[modalSelected - 1].style.backgroundColor = this.secondSubModalColor;
         this.shadow.style.display = "block";
         this.shadow.style.left = (X).toString() + "px";

@@ -7,6 +7,7 @@ let onReviewPage = window.location.href.endsWith("reviews");
 let modalImport;
 let modalClass;
 let modal;
+let shadow;
 
 window.onload = async function importModule() {
     const src = chrome.runtime.getURL('modules/modalStyle.js');
@@ -15,6 +16,7 @@ window.onload = async function importModule() {
     const html = (await chrome.storage.local.get("modalHTML"))["modalHTML"];
     modalClass = new modalImport.default(html,css);
     modal = modalClass.modal;
+    shadow = modalClass.shadow;
     if (window.location.href.endsWith("reviews")) {
         await Start();
     }
@@ -58,6 +60,7 @@ async function startFromHistoryStateChange() {
 
     modalClass = new modalImport.default;
     modal = modalClass.modal;
+    shadow = modalClass.shadow;
 
     modalSelected = 9;
 
@@ -95,8 +98,23 @@ async function endFromHistoryStateChange() {
     window.removeEventListener("mouseup", modalMouseControls);
 }
 
+async function startFromAppChange(){
+    loadObserver.disconnect();
+    reviewObserver.disconnect();
+    reviewContentBody = undefined;
+    selectedReviewcard = undefined;
+    userName = undefined;
+
+    replyTextArea = undefined;
+
+
+    loadObserver.observe(document.documentElement, {childList: true, subtree: true});
+    activated = false;
+    preActivated = false;
+}
+
 function append() {
-    document.querySelector("body").appendChild(modalClass.shadow);
+    document.querySelector("body").appendChild(shadow);
 }
 
 
@@ -320,7 +338,7 @@ function isRoomForModal(X, Y) {
 
 async function showModal(X, Y) {
     if (!document.pointerLockElement) {
-        await modal.requestPointerLock();
+        await shadow.requestPointerLock();
         pointerLockAvailable = false;
         modalSelected = 9;
         lastSelectedX = [];
@@ -471,10 +489,10 @@ function findParentObject(obj, containingObject) {
 
 
 async function lockChangeAlert() {
-    /*if (!(document.pointerLockElement === modal) && activated) {
+    if (!(document.pointerLockElement === shadow) && activated) {
         pointerLockAvailable = new Promise(resolve => setTimeout(resolve, 1300));
         await hideModal();
-    }*/
+    }
 }
 
 function pointerLockMouseMove(e) {
@@ -485,9 +503,6 @@ function pointerLockMouseMove(e) {
 
 async function modalKeyControls(keyboardEvent) {
     let key = keyboardEvent.key;
-    if (key.toLowerCase() === "g"){
-        append();
-    }
     if (activated) {
         if (key === "Enter") {
             keyboardEvent.preventDefault();
@@ -530,6 +545,10 @@ async function handleHistoryStateChange() {
     if (onReviewPage) {
         if (!url.endsWith("reviews")) {
             await endFromHistoryStateChange();
+        }
+        else {
+            console.log(reviewContentBody);
+            startFromAppChange();
         }
     } else {
         if (url.endsWith("reviews")) {
