@@ -1,9 +1,9 @@
 ## Bugs
 
 1. borders of Reviewcard not resettet at `Startmodal()`,maybe extra border color, for active Reviewcards? --> better Feedback, while User is waiting for `startModal`
-2. Add destroys `isModalVisible` calculation
-3. dead key for going one level up still inputs ^
-4. Modal appears sometimes only after reload of the page
+2. dead key for going one level up still inputs ^
+3. Modal appears sometimes only after reload of the page
+4. Username is sometimes wrong or undefined
 
 
 
@@ -38,3 +38,4 @@
 7. Error: Receiving end does not exist
 8. adjust scrolling of textarea when text gets added
 9. Caret position not always at the end with depthlevel 1
+10. Modal doesnt work after App change

@@ -46,11 +46,29 @@ async function Start() {
 
     loadObserver.observe(document.documentElement, {childList: true, subtree: true});
 
+
     append();
     await chrome.storage.local.get(["templates"]).then((result) => {
         templates = result.templates;
     });
     await applyDefaultTemplate();
+}
+
+function orderDropdownApps(){
+    let appDropDown = $("ar-projects-dropdown").find(".dropdown__content");
+    $('div:contains("PSD Banking Classic").dropdown__element.itunes').prependTo(appDropDown);
+    $('div:contains("PSD Banking Classic").dropdown__element.googleplay').prependTo(appDropDown);
+    $('div:contains("VR-SecureGo").dropdown__element.itunes').prependTo(appDropDown);
+    $('div:contains("VR-SecureGo").dropdown__element.googleplay').prependTo(appDropDown);
+    $('div:contains("VR Banking Classic").dropdown__element.itunes').prependTo(appDropDown);
+    $('div:contains("VR Banking Classic").dropdown__element.googleplay').prependTo(appDropDown);
+    $('div:contains("PSD Banking").dropdown__element.itunes').eq(1).prependTo(appDropDown);
+    $('div:contains("PSD Banking").dropdown__element.googleplay').eq(1).prependTo(appDropDown);
+    $('div:contains("VR SecureGo plus").dropdown__element.itunes').prependTo(appDropDown);
+    $('div:contains("VR SecureGo plus").dropdown__element.googleplay').prependTo(appDropDown);
+    $('div:contains("VR Banking - einfach sicher").dropdown__element.itunes').prependTo(appDropDown);
+    $('div:contains("VR Banking - einfach sicher").dropdown__element.googleplay').prependTo(appDropDown);
+    $('div:contains("My Apps Overview").dropdown__element').prependTo(appDropDown);
 }
 
 async function startFromHistoryStateChange() {
@@ -78,7 +96,7 @@ async function startFromHistoryStateChange() {
     await Start();
 }
 
-async function endFromHistoryStateChange() {
+function endFromHistoryStateChange() {
     loadObserver.disconnect();
     reviewObserver.disconnect();
     reviewContentBody = undefined;
@@ -98,7 +116,7 @@ async function endFromHistoryStateChange() {
     window.removeEventListener("mouseup", modalMouseControls);
 }
 
-async function startFromAppChange(){
+function startFromAppChange(){
     loadObserver.disconnect();
     reviewObserver.disconnect();
     reviewContentBody = undefined;
@@ -120,13 +138,12 @@ function append() {
 
 //check if the review containing div has been loaded
 let loadObserver = new MutationObserver(function (mutations) {
-    if (document.getElementsByClassName("maingrid__content content").length !== 0) {
-    }
     //mit added Note vielleicht performanter
     if (document.getElementsByClassName("content__body__main reviews-content-body").length !== 0) {
         reviewContentBody = document.getElementsByClassName("content__body__main reviews-content-body")[0];
         reviewObserver.observe(reviewContentBody,
             {childList: true, subtree: true});
+        orderDropdownApps();
         loadObserver.disconnect();
     }
 });
@@ -161,9 +178,8 @@ let selectedReviewcard;
 let userName;
 
 function selectReviewcard(e) {
-    if (preActivated) {
+    if (preActivated === true && isStartModalRunning === false) {
         selectedReviewcard = e.target;
-        userName = $(selectedReviewcard).find(".reviewcard__username").text().trim();
         e.target.style.border = "1px solid black";
         //TODO richter border Radius finden
         e.target.style.borderRadius = "5px";
@@ -172,7 +188,7 @@ function selectReviewcard(e) {
 }
 
 function deSelectReviewcard(e) {
-    if (selectedReviewcard === e.target) {
+    if (selectedReviewcard === e.target && isStartModalRunning === false) {
         selectedReviewcard = undefined;
         userName = undefined;
     }
@@ -212,6 +228,7 @@ async function startModal(e) {
         if (pointerLockAvailable instanceof Promise) {
             await pointerLockAvailable;
         }
+        userName = $(selectedReviewcard).find(".reviewcard__username").text().trim();
         await handleTextarea(this);
         await positionModal(this);
         isStartModalRunning = false;
@@ -219,6 +236,10 @@ async function startModal(e) {
 }
 
 async function handleTextarea(that){
+    if (userName === "" || userName === undefined){
+        console.error(userName);
+        console.error(selectedReviewcard);
+    }
     replyTextArea = that.querySelector("textarea");
     //if review is unopened, textarea needs a bit of time to open
     while (!replyTextArea) {
@@ -503,6 +524,9 @@ function pointerLockMouseMove(e) {
 
 async function modalKeyControls(keyboardEvent) {
     let key = keyboardEvent.key;
+    if (key === "g"){
+        orderDropdownApps();
+    }
     if (activated) {
         if (key === "Enter") {
             keyboardEvent.preventDefault();
@@ -547,7 +571,6 @@ async function handleHistoryStateChange() {
             await endFromHistoryStateChange();
         }
         else {
-            console.log(reviewContentBody);
             startFromAppChange();
         }
     } else {

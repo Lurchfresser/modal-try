@@ -6,7 +6,6 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     }
     if (details.reason === "update") {
         await chrome.storage.local.get(["templates"]).then((result) => {
-            console.log(result);
         });
         //sets modal HTML to Storage, so it can be requested from anywhere
         //TODO rewrite to be cleaner

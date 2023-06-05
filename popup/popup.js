@@ -68,5 +68,4 @@ async function getCurrentTab() {
 
 async function applySettings(tab) {
     const response = await chrome.tabs.sendMessage(tab.id,);
-    console.log(response);
 }
