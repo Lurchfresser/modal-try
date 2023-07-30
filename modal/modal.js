@@ -9,6 +9,8 @@ let modalClass;
 let modal;
 let shadow;
 
+
+
 window.onload = async function importModule() {
     const src = chrome.runtime.getURL('modules/modalStyle.js');
     modalImport = await import(src);
@@ -54,29 +56,14 @@ async function Start() {
     await applyDefaultTemplate();
 }
 
-function orderDropdownApps(){
-    let appDropDown = $("ar-projects-dropdown").find(".dropdown__content");
-    $('div:contains("PSD Banking Classic").dropdown__element.itunes').prependTo(appDropDown);
-    $('div:contains("PSD Banking Classic").dropdown__element.googleplay').prependTo(appDropDown);
-    $('div:contains("VR-SecureGo").dropdown__element.itunes').prependTo(appDropDown);
-    $('div:contains("VR-SecureGo").dropdown__element.googleplay').prependTo(appDropDown);
-    $('div:contains("VR Banking Classic").dropdown__element.itunes').prependTo(appDropDown);
-    $('div:contains("VR Banking Classic").dropdown__element.googleplay').prependTo(appDropDown);
-    $('div:contains("PSD Banking").dropdown__element.itunes').eq(1).prependTo(appDropDown);
-    $('div:contains("PSD Banking").dropdown__element.googleplay').eq(1).prependTo(appDropDown);
-    $('div:contains("VR SecureGo plus").dropdown__element.itunes').prependTo(appDropDown);
-    $('div:contains("VR SecureGo plus").dropdown__element.googleplay').prependTo(appDropDown);
-    $('div:contains("VR Banking - einfach sicher").dropdown__element.itunes').prependTo(appDropDown);
-    $('div:contains("VR Banking - einfach sicher").dropdown__element.googleplay').prependTo(appDropDown);
-    $('div:contains("My Apps Overview").dropdown__element').prependTo(appDropDown);
-}
-
 async function startFromHistoryStateChange() {
     loadObserver.observe(document.documentElement, {childList: true, subtree: true});
     activated = false;
     preActivated = false;
 
-    modalClass = new modalImport.default;
+    const css = (await chrome.storage.local.get("modalCSS"))["modalCSS"];
+    const html = (await chrome.storage.local.get("modalHTML"))["modalHTML"];
+    modalClass = new modalImport.default(html,css);
     modal = modalClass.modal;
     shadow = modalClass.shadow;
 
@@ -114,6 +101,23 @@ function endFromHistoryStateChange() {
     window.removeEventListener("mousemove", pointerLockMouseMove);
     window.removeEventListener("keydown", modalKeyControls);
     window.removeEventListener("mouseup", modalMouseControls);
+}
+
+function orderDropdownApps(){
+    let appDropDown = $("ar-projects-dropdown").find(".dropdown__content");
+    $('div:contains("PSD Banking Classic").dropdown__element.itunes').prependTo(appDropDown);
+    $('div:contains("PSD Banking Classic").dropdown__element.googleplay').prependTo(appDropDown);
+    $('div:contains("VR-SecureGo").dropdown__element.itunes').prependTo(appDropDown);
+    $('div:contains("VR-SecureGo").dropdown__element.googleplay').prependTo(appDropDown);
+    $('div:contains("VR Banking Classic").dropdown__element.itunes').prependTo(appDropDown);
+    $('div:contains("VR Banking Classic").dropdown__element.googleplay').prependTo(appDropDown);
+    $('div:contains("PSD Banking").dropdown__element.itunes').eq(1).prependTo(appDropDown);
+    $('div:contains("PSD Banking").dropdown__element.googleplay').eq(1).prependTo(appDropDown);
+    $('div:contains("VR SecureGo plus").dropdown__element.itunes').prependTo(appDropDown);
+    $('div:contains("VR SecureGo plus").dropdown__element.googleplay').prependTo(appDropDown);
+    $('div:contains("VR Banking - einfach sicher").dropdown__element.itunes').prependTo(appDropDown);
+    $('div:contains("VR Banking - einfach sicher").dropdown__element.googleplay').prependTo(appDropDown);
+    $('div:contains("My Apps Overview").dropdown__element').prependTo(appDropDown);
 }
 
 function startFromAppChange(){
@@ -386,7 +390,6 @@ let lastSelectedY = [];
 
 function select(e) {
 
-
     while (lastSelectedX.length > 5) {
         lastSelectedX.pop();
     }
@@ -580,6 +583,13 @@ async function handleHistoryStateChange() {
     }
     onReviewPage = window.location.href.endsWith("reviews");
 }
+
+class ControlArray extends Array{
+
+}
+
+
+
 
 chrome.runtime.onMessage.addListener(async function (request, sender, sendResponse) {
     if (request?.reason === "new template") {

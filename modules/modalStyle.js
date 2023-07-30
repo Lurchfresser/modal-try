@@ -13,6 +13,7 @@ export default class modalClass {
 
 
     constructor(html, css) {
+        console.log(html);
         this.shadow.style.display = "none";
         this.shadow.style.position = "absolute";
 
